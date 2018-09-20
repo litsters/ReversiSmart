@@ -36,7 +36,6 @@ public class ReversiSmart {
         initHost(host);
 
         // Move whenever it's this player's turn
-        int myMove;
         while(true){
             System.out.println("Read");
             updateState();
@@ -46,7 +45,7 @@ public class ReversiSmart {
                 System.out.println("Move");
                 this.validMoves = this.state.getValidMoves(round);
 
-                myMove = move();
+                int myMove = move();
                 String sel = validMoves.getValue(myMove) / 8 + "\n" + validMoves.getValue(myMove) % 8;
                 System.out.println("Selection: " + validMoves.getValue(myMove) / 8 + ", " + validMoves.getValue(myMove) % 8);
                 this.socket.send(sel);
