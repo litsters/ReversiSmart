@@ -1,5 +1,5 @@
 package main;
 
 public interface IVisitor {
-    public void visit(IGameTreeNode node);
+    public IGameTreeNode visit(IGameTreeNode node, int alpha, int beta, boolean myTurn);
 }
