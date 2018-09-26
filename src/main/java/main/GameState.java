@@ -12,6 +12,20 @@ public class GameState {
         state = new int[8][8];  // state[0][0] is the bottom-left corner of the board
     }
 
+    public int[][] getStatesArray(){
+        return state;
+    }
+    public void setStatesArray(int[][] state){
+        this.state = state;
+    }
+
+    public void setPlayerNumber(int playerNumber){
+        this.playerNumber = playerNumber;
+    }
+    public int getPlayerNumber(){
+        return playerNumber;
+    }
+
     /**
      * Sets a value at a specific space on the board
      * @param value The value to use
@@ -46,19 +60,19 @@ public class GameState {
             if(getValue(3,4) == 0) validMoves.addMove(3*8 + 4);
             if(getValue(4,3) == 0) validMoves.addMove(4*8 + 3);
             if(getValue(4,4) == 0) validMoves.addMove(4*8 + 4);
-            System.out.println("Valid moves:");
+            //System.out.println("Valid moves:");
             for(int i = 0; i < validMoves.getNumValidMoves(); ++i){
-                System.out.println(validMoves.getValue(i) / 8 + ", " + validMoves.getValue(i) % 8);
+//                System.out.println(validMoves.getValue(i) / 8 + ", " + validMoves.getValue(i) % 8);
             }
         } else {
             // We're in the remainder of the game
-            System.out.println("Valid Moves:");
+            //System.out.println("Valid Moves:");
             for(int i = 0; i < 8; ++i){
                 for(int j = 0; j < 8; j++){
                     if(getValue(i,j) == 0) {
                         if(couldBe(i,j)){
                             validMoves.addMove(i*8 + j);
-                            System.out.println(i + ", " + j);
+//                            System.out.println(i + ", " + j);
                         }
                     }
                 }

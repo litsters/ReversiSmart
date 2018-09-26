@@ -1,5 +1,6 @@
 package main.dummy;
 
+import main.GameState;
 import main.IGameTreeNode;
 
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ public class DummyNode implements IGameTreeNode {
     private int id;
     private int value;
     private List<IGameTreeNode> children;
+
 
     public DummyNode(int id, int value, IGameTreeNode... children){
         this.id = id;
@@ -35,5 +37,33 @@ public class DummyNode implements IGameTreeNode {
     @Override
     public void setUtility(int value) {
         this.value = value;
+    }
+
+    @Override
+    public void setChildren(List<IGameTreeNode> children){
+        this.children = children;
+    }
+
+    @Override
+    public void setState(GameState state){
+
+    }
+    @Override
+    public GameState getState(){
+        return null;
+    }
+    @Override
+    public int getRound(){
+        return -1;
+    }
+    @Override
+    public void setRound(int round){
+
+    }
+    public int getIndex(){
+        return -1;
+    }
+    public void setIndex(int index){
+
     }
 }
