@@ -67,7 +67,7 @@ public class ReversiSmart {
         GameTree tree = new GameTree(state,round);
         IVisitor test = new Visitor();
         IGameTreeNode root = tree.getRoot();
-        IGameTreeNode result = test.visit(root, Integer.MIN_VALUE, Integer.MAX_VALUE, false);
+        IGameTreeNode result = test.visit(root, Integer.MIN_VALUE, Integer.MAX_VALUE, true);
         return result.getIndex();
     }
 
