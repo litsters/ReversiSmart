@@ -10,7 +10,6 @@ public interface IGameTreeNode {
     public void setState(GameState state);
     public void setChildren(List<IGameTreeNode> children);
     public int getRound();
-    public void setRound(int round);
     public int getIndex();
     public void setIndex(int index);
 }

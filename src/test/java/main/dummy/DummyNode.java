@@ -56,10 +56,7 @@ public class DummyNode implements IGameTreeNode {
     public int getRound(){
         return -1;
     }
-    @Override
-    public void setRound(int round){
 
-    }
     public int getIndex(){
         return -1;
     }

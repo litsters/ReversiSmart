@@ -24,4 +24,7 @@ public class GameTreeTest {
         /**playerNumber 1 for the black player, 2 for the white player*/
     }
 
+
+
+
 }

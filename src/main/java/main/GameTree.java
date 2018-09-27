@@ -18,16 +18,14 @@ public class GameTree implements IGameTree{
     private PriorityQueue<IGameTreeNode> priorityQueue;
     private int maxInQueue = 0;
 
-    public GameTree(GameState state,int round) {
+    public GameTree(GameState state, int round) {
         priorityQueue = new PriorityQueue<>(11, new NodeComparator());
 
         GameState gameState = new GameState(state.getPlayerNumber());
         int [][] tempStatesArray = copyArray(state.getStatesArray());
         gameState.setStatesArray(tempStatesArray);
 
-        root = new GameTreeNode(gameState);
-
-        root.setRound(round);
+        root = new GameTreeNode(gameState,round);
 
         long startTime = System.currentTimeMillis();
         long endTime = startTime + SECS_PER_MOVE;
@@ -90,9 +88,7 @@ public class GameTree implements IGameTree{
             gameState.setStatesArray(tempStatesArray);
             gameState.setValue(childNodePlayerNumber, row, col);
 
-
-            GameTreeNode tempNode = new GameTreeNode(gameState);
-            tempNode.setRound(round);
+            GameTreeNode tempNode = new GameTreeNode(gameState,round);
             tempNode.setIndex(i);
             //node.getChildren().add(tempNode);
             children.add(tempNode);

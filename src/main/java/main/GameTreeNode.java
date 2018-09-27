@@ -37,12 +37,9 @@ public class GameTreeNode implements IGameTreeNode{
         return round;
     }
 
-    public void setRound(int round) {
-        this.round = round;
-    }
-
-    public GameTreeNode(GameState state){
+    public GameTreeNode(GameState state, int round){
         this.state = state;
+        this.round = round;
         calculateUtility();
     }
 
