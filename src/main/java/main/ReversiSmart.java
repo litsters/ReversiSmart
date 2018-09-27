@@ -58,12 +58,11 @@ public class ReversiSmart {
      * @return The index of the right move to make.
      */
     private int move(){
-//        return generator.nextInt(this.validMoves.getNumValidMoves());
+        //return generator.nextInt(this.validMoves.getNumValidMoves());
         //GameState state = new GameState(playerNumber);
         if(round < 4){
             return generator.nextInt(this.validMoves.getNumValidMoves());
         }
-
         GameTree tree = new GameTree(state,round);
         IVisitor test = new Visitor();
         IGameTreeNode root = tree.getRoot();

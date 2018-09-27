@@ -9,11 +9,6 @@ import javax.xml.soap.Node;
 
 public class GameTree implements IGameTree{
     private static final int SECS_PER_MOVE = 2812;  // Number of milliseconds per move, given 3 minutes of game time
-
-
-    //value 1 is for player 1, value 2 is for player 2
-//    private int playerNumber = 1;
-
     private GameTreeNode root;
     private PriorityQueue<IGameTreeNode> priorityQueue;
     private int maxInQueue = 0;
@@ -31,7 +26,8 @@ public class GameTree implements IGameTree{
 //        long endTime = startTime + SECS_PER_MOVE;
 
         buildChildren(root, root.getRound()+1, root.getState().getPlayerNumber());
-//        This code works for three levels
+
+        //This code works for three levels
         for (IGameTreeNode node : root.getChildren()) {
             buildChildren(node, node.getRound()+1, node.getState().getPlayerNumber());
             if(node.getChildren() != null) {
@@ -40,12 +36,6 @@ public class GameTree implements IGameTree{
                 }
             }
         }
-//        int dummy = 0;
-//        for( IGameTreeNode node: root.getChildren()){
-//            for (IGameTreeNode childNode: node.getChildren()){
-//                buildChildren(node,2,childNode.getState().getPlayerNumber());
-//            }
-//        }
 
 //        IGameTreeNode node = priorityQueue.poll();
 //        while(System.currentTimeMillis() < endTime && node != null){
@@ -56,38 +46,21 @@ public class GameTree implements IGameTree{
 //            node = priorityQueue.poll();
 //        }
 
-//        for(int i = 0; i < 20; i++){
-//            if(maxInQueue < priorityQueue.size()){
-//                maxInQueue = priorityQueue.size();
-//                //System.out.println("Changed size");
-//            }
-//            IGameTreeNode node = priorityQueue.poll();
-//            if(node != null){
-//                buildChildren(node,node.getRound() + 1, node.getState().getPlayerNumber());
-//            }
-//        }
-
-        System.out.println("Round: " + round + " MaxInQueue: " + maxInQueue);
-
     }
 
     private void buildChildren(IGameTreeNode node, int round, int playerNumber){
-
         List<IGameTreeNode> children = new ArrayList<>();
-
         ValidMoves validMoves = node.getState().getValidMoves(round);
         int numValidMoves = node.getState().getValidMoves(round).getNumValidMoves();
 
         for( int i = 0; i < numValidMoves; i++){
             int index = validMoves.getValue(i);
-
             int col  = index % 8;
             int row = index / 8;
 
             int childNodePlayerNumber = ((playerNumber + 1) % 3 == 0) ? 1 : 2 ;
 
             GameState gameState = new GameState(childNodePlayerNumber);
-
             int [][] tempStatesArray = copyArray(node.getState().getStatesArray());
 
             gameState.setStatesArray(tempStatesArray);
@@ -95,7 +68,6 @@ public class GameTree implements IGameTree{
 
             GameTreeNode tempNode = new GameTreeNode(gameState,round);
             tempNode.setIndex(i);
-            //node.getChildren().add(tempNode);
             children.add(tempNode);
             priorityQueue.add(tempNode);
         }
@@ -117,7 +89,6 @@ public class GameTree implements IGameTree{
     }
 
     class NodeComparator implements Comparator<IGameTreeNode> {
-
         public int compare(IGameTreeNode n1, IGameTreeNode n2) {
             if (n1.getUtility() < n2.getUtility())
                 return 1;
