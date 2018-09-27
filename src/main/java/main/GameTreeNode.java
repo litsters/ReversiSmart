@@ -3,16 +3,18 @@ package main;
 import java.util.List;
 
 public class GameTreeNode implements IGameTreeNode{
+    private static final int WIN_UTILITY = 1000;
+    private static final int LOSS_UTILITY = -1000;
 
     private int[][] values = {
-                                {20, -3, 11,  8,  8, 11, -3, 20},
-                                {-3, -7, -4,  1,  1, -4, -7, -3},
+                                {200, -3, 11,  8,  8, 11, -3, 200},
+                                {-3, -200, -4,  1,  1, -4, -200, -3},
                                 {11, -4,  2,  2,  2,  2, -4, 11},
                                 { 8,  1,  2, -3, -3,  2,  1,  8},
                                 { 8,  1,  2, -3, -3,  2,  1,  8},
                                 {11, -4,  2,  2,  2,  2, -4, 11},
-                                {-3, -7, -4,  1,  1, -4, -7, -3},
-                                {20, -3, 11,  8,  8, 11, -3, 20},
+                                {-3, -200, -4,  1,  1, -4, -200, -3},
+                                {200, -3, 11,  8,  8, 11, -3, 200},
                              };
 
     GameState state;
@@ -71,6 +73,20 @@ public class GameTreeNode implements IGameTreeNode{
     }
 
     private void calculateUtility(){
+        if(endState()){
+            int myPieces = 0;
+            int theirPieces = 0;
+            for(int i = 0; i < 8; i++){
+                for(int j = 0; j < 8; j++){
+                    if(this.state.getValue(i,j) == this.state.getPlayerNumber()) ++myPieces;
+                    else ++theirPieces;
+                }
+            }
+            if(myPieces > theirPieces) utility = WIN_UTILITY;
+            else utility = LOSS_UTILITY;
+            return;
+        }
+
         utility = 0;
         int[][] statesArray = this.state.getStatesArray();
         for(int i = 0; i < 8; i++){
@@ -78,8 +94,14 @@ public class GameTreeNode implements IGameTreeNode{
                 if(statesArray[i][j] == this.state.getPlayerNumber()){
                     int temp = values[i][j];
                     utility += values[i][j];
+                } else if(statesArray[i][j] != 0){
+                    utility -= values[i][j];
                 }
             }
         }
+    }
+
+    private boolean endState(){
+        return this.state.getValidMoves(round).getNumValidMoves() == 0;
     }
 }
