@@ -3,24 +3,19 @@ package main;
 import java.util.List;
 
 public class GameTreeNode implements IGameTreeNode{
-    private static final int WIN_UTILITY = 1000;
-    private static final int LOSS_UTILITY = -1000;
+    public static int UTILITY_PLAYER_NUMBER = 0;    // Needs to be set for correct evaluation
 
-    private int[][] values = {
-                                {200, -150, 11,  8,  8, 11, -150, 200},
-                                {-150, -200, -4,  1,  1, -4, -200, -150},
-                                {11, -4,  2,  2,  2,  2, -4, 11},
-                                { 8,  1,  2, -3, -3,  2,  1,  8},
-                                { 8,  1,  2, -3, -3,  2,  1,  8},
-                                {11, -4,  2,  2,  2,  2, -4, 11},
-                                {-150, -200, -4,  1,  1, -4, -200, -150},
-                                {200, -150, 11,  8,  8, 11, -150, 200},
-                             };
+    private static final int WIN_UTILITY = 100000;
+    private static final int LOSS_UTILITY = -100000;
+    private static final int STUPIDITY_UTILITY = -2500;
+    private static final int STABLE_UTILITY = 500;
+    private static final int FRONTIER_UTILITY = -10;
+    private static final int MOVE_UTILITY = 1;
 
     GameState state;
     private int index;
     private int utility = 0;
-    private int round = 0;
+    private int round;
 
     private List<IGameTreeNode> children;
 
@@ -75,7 +70,7 @@ public class GameTreeNode implements IGameTreeNode{
             int theirPieces = 0;
             for(int i = 0; i < 8; i++){
                 for(int j = 0; j < 8; j++){
-                    if(this.state.getValue(i,j) == this.state.getPlayerNumber()) ++myPieces;
+                    if(this.state.getValue(i,j) == UTILITY_PLAYER_NUMBER) ++myPieces;
                     else ++theirPieces;
                 }
             }
@@ -84,18 +79,122 @@ public class GameTreeNode implements IGameTreeNode{
             return;
         }
 
-        utility = 0;
-        int[][] statesArray = this.state.getStatesArray();
-        for(int i = 0; i < 8; i++){
-            for(int j = 0; j < 8; j++){
-                if(statesArray[i][j] == this.state.getPlayerNumber()){
-                    int temp = values[i][j];
-                    utility += values[i][j];
-                } else if(statesArray[i][j] != 0){
-                    utility -= values[i][j];
+        utility = numStable(state) * STABLE_UTILITY;
+        utility += numFrontier(state) * FRONTIER_UTILITY;
+        utility += numMoves(state) * MOVE_UTILITY;
+        utility += numStupid(state) * STUPIDITY_UTILITY;
+    }
+
+    public int numStupid(GameState state){
+        int count = 0;
+        count += xspaces(state, UTILITY_PLAYER_NUMBER);
+        count += cspaces(state, UTILITY_PLAYER_NUMBER);
+
+        return count;
+    }
+
+    public int cspaces(GameState state, int playerNumber){
+        int count = 0;
+        if(state.getValue(0,0) != playerNumber && state.getValue(1,0) == playerNumber) ++count;
+        if(state.getValue(0,0) != playerNumber && state.getValue(0,1) == playerNumber) ++count;
+        if(state.getValue(0,7) != playerNumber && state.getValue(1,7) == playerNumber) ++count;
+        if(state.getValue(0,7) != playerNumber && state.getValue(0,6) == playerNumber) ++count;
+        if(state.getValue(7,0) != playerNumber && state.getValue(6,0) == playerNumber) ++count;
+        if(state.getValue(7,0) != playerNumber && state.getValue(7,1) == playerNumber) ++count;
+        if(state.getValue(7,7) != playerNumber && state.getValue(7,6) == playerNumber) ++count;
+        if(state.getValue(7,7) != playerNumber && state.getValue(6,7) == playerNumber) ++count;
+        return count;
+    }
+
+    public int xspaces(GameState state, int playerNumber){
+        int count = 0;
+        if(state.getValue(0,0) != playerNumber && state.getValue(1,1) == playerNumber) ++count;
+        if(state.getValue(0,7) != playerNumber && state.getValue(1,6) == playerNumber) ++count;
+        if(state.getValue(7,0) != playerNumber && state.getValue(6,1) == playerNumber) ++count;
+        if(state.getValue(7,7) != playerNumber && state.getValue(6,6) == playerNumber) ++count;
+        return count;
+    }
+
+    public int numMoves(GameState state){
+        return state.getValidMoves(round).getNumValidMoves();
+    }
+
+    public int numFrontier(GameState state){
+        int count = 0;
+        for(int i = 0; i < 8; ++i){
+            for(int j = 0; j < 8; ++j){
+                if(state.getValue(i,j) == UTILITY_PLAYER_NUMBER){
+                    if(j > 0 && state.getValue(i, j-1) == 0) ++count;       // Check to the left
+                    else if(j < 7 && state.getValue(i, j+1) == 0) ++count;  // Check to the right
+                    else if(i > 0 && state.getValue(i-1,j) == 0) ++count;   // Check up
+                    else if(i < 7 && state.getValue(i+1, j) == 0) ++count; // Check down
                 }
             }
         }
+        return count;
+    }
+
+    public int numStable(GameState state){
+        int playerNumber = UTILITY_PLAYER_NUMBER;
+        // Initialize array for tracking checks
+        boolean[][] checked = new boolean[8][8];
+        for(int i = 0; i < 8; ++i)for(int j = 0; j < 8; ++j) checked[i][j] = false;
+
+        int count = 0;
+        // Check 0,0 corner
+        if(state.getValue(0,0) == playerNumber){
+            for(int i = 0; i < 8; ++i){
+                if(state.getValue(i,0) != playerNumber || checked[i][0]) break;    // Need to control the first spot in each row
+                for(int j = 0; j < 8; ++j){
+                    if(state.getValue(i,j) != playerNumber || checked[i][j]) break;
+                    else{
+                        ++count;
+                        checked[i][j] = true;
+                    }
+                }
+            }
+        }
+        // Check 0,7 corner
+        if(state.getValue(0,7) == playerNumber){
+            for(int i = 0; i < 8; ++i){
+                if(state.getValue(i,0) != playerNumber || checked[i][0]) break;    // Need to control the last spot in each row
+                for(int j = 7; j >= 0; --j){
+                    if(state.getValue(i,j) != playerNumber || checked[i][j]) break;
+                    else{
+                        ++count;
+                        checked[i][j] = true;
+                    }
+                }
+            }
+        }
+        // Check 7,0 corner
+        if(state.getValue(7,0) == playerNumber){
+            for(int i = 7; i >= 0; --i){
+                if(state.getValue(i,0) != playerNumber || checked[i][0]) break;    // Need to control the first spot in each row
+                for(int j = 0; j < 8; ++j){
+                    if(state.getValue(i,j) != playerNumber || checked[i][j]) break;
+                    else{
+                        ++count;
+                        checked[i][j] = true;
+                    }
+                }
+            }
+        }
+        // Check 7,7 corner
+        if(state.getValue(7,7) == playerNumber){
+            for(int i = 7; i >= 0; --i){
+                if(state.getValue(i, 7) != playerNumber || checked[i][7]) break;   // Need to control the last spot in each row
+                for(int j = 7; j >= 0; --j){
+                    if(state.getValue(i,j) != playerNumber || checked[i][j]) break;
+                    else {
+                        ++count;
+                        checked[i][j] = true;
+                    }
+                }
+            }
+        }
+
+        return count;
     }
 
     private boolean endState(){

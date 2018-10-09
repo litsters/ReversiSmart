@@ -19,7 +19,8 @@ public class PlayerSocket {
             socket = new Socket(host, portNumber);
             sout = new PrintWriter(socket.getOutputStream(), true);
             sin = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            System.out.println(sin.readLine());
+//            System.out.println(sin.readLine());
+            sin.readLine();
         }catch(IOException e){
             System.err.println("Socket failed: " + e.getMessage());
         }

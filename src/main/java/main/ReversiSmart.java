@@ -33,21 +33,22 @@ public class ReversiSmart {
 
         // Establish the connection
         this.playerNumber = playerNumber;
+        GameTreeNode.UTILITY_PLAYER_NUMBER = this.playerNumber;
         initHost(host);
 
         // Move whenever it's this player's turn
         while(true){
-            System.out.println("Read");
+//            System.out.println("Read");
             updateState();
 
             if(this.turn == this.playerNumber){
                 // It is this player's turn
-                System.out.println("Move");
+//                System.out.println("Move");
                 this.validMoves = this.state.getValidMoves(round);
 
                 int myMove = move();
                 String sel = validMoves.getValue(myMove) / 8 + "\n" + validMoves.getValue(myMove) % 8;
-                System.out.println("Selection: " + validMoves.getValue(myMove) / 8 + ", " + validMoves.getValue(myMove) % 8);
+//                System.out.println("Selection: " + validMoves.getValue(myMove) / 8 + ", " + validMoves.getValue(myMove) % 8);
                 this.socket.send(sel);
             }
         }
@@ -58,8 +59,6 @@ public class ReversiSmart {
      * @return The index of the right move to make.
      */
     private int move(){
-        //return generator.nextInt(this.validMoves.getNumValidMoves());
-        //GameState state = new GameState(playerNumber);
         if(round < 4){
             return generator.nextInt(this.validMoves.getNumValidMoves());
         }
@@ -67,6 +66,8 @@ public class ReversiSmart {
         IVisitor test = new Visitor();
         IGameTreeNode root = tree.getRoot();
         IGameTreeNode result = test.visit(root, Integer.MIN_VALUE, Integer.MAX_VALUE, true);
+        System.out.println("Utility = " + result.getUtility());
+        result.getState().display();
         return result.getIndex();
     }
 
@@ -89,9 +90,9 @@ public class ReversiSmart {
 
             round = Integer.parseInt(socket.getLine());
             double t1 = Double.parseDouble(socket.getLine());
-            System.out.println(t1);
+//            System.out.println(t1);
             double t2 = Double.parseDouble(socket.getLine());
-            System.out.println(t2);
+//            System.out.println(t2);
             for (int i = 0; i < 8; i++) {
                 for (int j = 0; j < 8; j++) {
                     this.state.setValue(Integer.parseInt(socket.getLine()), i, j);
@@ -102,15 +103,15 @@ public class ReversiSmart {
             System.err.println("Caught IOException: " + e.getMessage());
         }
 
-        System.out.println("Turn: " + turn);
-        System.out.println("Round: " + round);
-        for (int i = 7; i >= 0; i--) {
-            for (int j = 0; j < 8; j++) {
-                System.out.print(state.getValue(i,j));
-            }
-            System.out.println();
-        }
-        System.out.println();
+//        System.out.println("Turn: " + turn);
+//        System.out.println("Round: " + round);
+//        for (int i = 7; i >= 0; i--) {
+//            for (int j = 0; j < 8; j++) {
+//                System.out.print(state.getValue(i,j));
+//            }
+//            System.out.println();
+//        }
+//        System.out.println();
     }
 
     /**

@@ -149,4 +149,16 @@ public class GameState {
 
         return false;
     }
+
+    public void display(){
+        System.out.println("*** Printing state ***");
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < 8; ++i){
+            for(int j = 0; j < 8; ++j){
+                sb.append(state[i][j]).append(",");
+            }
+            sb.append("\n");
+        }
+        System.out.println(sb.toString());
+    }
 }
