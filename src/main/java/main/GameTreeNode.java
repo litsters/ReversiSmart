@@ -203,15 +203,6 @@ public class GameTreeNode implements IGameTreeNode{
         return count;
     }
 
-//    public int safeInDirection(GameState state, int row, int col, int rMod, int cMod, int playerNumber){
-//        int count = 0;
-//        for(int r = row; r < 8; r+=rMod){
-//            for(int c = col; c < 8; c+=cMod){
-//                // Look for consecutive
-//            }
-//        }
-//    }
-
     public int numStupid(GameState state){
         int count = 0;
         count += xspaces(state, UTILITY_PLAYER_NUMBER);
@@ -222,14 +213,63 @@ public class GameTreeNode implements IGameTreeNode{
 
     public int cspaces(GameState state, int playerNumber){
         int count = 0;
-        if(state.getValue(0,0) != playerNumber && state.getValue(1,0) == playerNumber) ++count;
-        if(state.getValue(0,0) != playerNumber && state.getValue(0,1) == playerNumber) ++count;
-        if(state.getValue(0,7) != playerNumber && state.getValue(1,7) == playerNumber) ++count;
-        if(state.getValue(0,7) != playerNumber && state.getValue(0,6) == playerNumber) ++count;
-        if(state.getValue(7,0) != playerNumber && state.getValue(6,0) == playerNumber) ++count;
-        if(state.getValue(7,0) != playerNumber && state.getValue(7,1) == playerNumber) ++count;
-        if(state.getValue(7,7) != playerNumber && state.getValue(7,6) == playerNumber) ++count;
-        if(state.getValue(7,7) != playerNumber && state.getValue(6,7) == playerNumber) ++count;
+        if(state.getValue(0,0) != playerNumber){
+            if(state.getValue(0,1) == playerNumber){
+                boolean stupid = false;
+                for(int col = 2; col < 8; ++col){
+                    if(state.getValue(0,col) != playerNumber) stupid = true;
+                }
+                if(stupid) ++count;
+            }
+            if(state.getValue(1,0) == playerNumber){
+                boolean stupid = false;
+                for(int row = 2; row < 8; ++row){
+                    if(state.getValue(row,0) != playerNumber) stupid = true;
+                }
+                if(stupid) ++count;
+            }
+        }
+        if(state.getValue(0,7) != playerNumber){
+            if(state.getValue(1,7) == playerNumber){
+                boolean stupid = false;
+                for(int row = 2; row < 8; ++row){
+                    if(state.getValue(row,7) != playerNumber) stupid = true;
+                }
+                if(stupid) ++count;
+            }
+            if(state.getValue(0,6) == playerNumber){
+                boolean stupid = false;
+                for(int col = 0; col < 6; ++col){
+                    if(state.getValue(0,col) != playerNumber) stupid = true;
+                }
+                if(stupid) ++count;
+            }
+        }
+        if(state.getValue(7,0) != playerNumber){
+            if(state.getValue(6,0) == playerNumber){
+                boolean stupid = false;
+                for(int row = 0; row < 6; ++row) if(state.getValue(row,0) != playerNumber) stupid = true;
+                if(stupid) ++count;
+            }
+            if(state.getValue(7,1) == playerNumber){
+                boolean stupid = false;
+                for(int col = 2; col < 8; ++col) if(state.getValue(7,col) != playerNumber) stupid = true;
+                if(stupid) ++count;
+            }
+        }
+        if(state.getValue(7,7) != playerNumber){
+            if(state.getValue(7,6) == playerNumber){
+                boolean stupid = false;
+                for(int col = 0; col < 6; ++col) if(state.getValue(7,col) != playerNumber) stupid = true;
+                if(stupid) ++count;
+            }
+            if(state.getValue(6,7) == playerNumber){
+                boolean stupid = false;
+                for(int row = 0; row < 6; ++row) if(state.getValue(row,7) != playerNumber) stupid = true;
+                if(stupid) ++count;
+            }
+        }
+
         return count;
     }
 
