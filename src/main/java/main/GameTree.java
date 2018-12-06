@@ -10,7 +10,7 @@ public class GameTree implements IGameTree{
     private Queue<IGameTreeNode> queue;
     private int maxInQueue = 0;
 
-    public GameTree(GameState state, int round) {
+    public GameTree(GameState state, int round, int secsForMove) {
         queue = new LinkedList<>();
 
         GameState gameState = new GameState(state.getPlayerNumber());
@@ -20,7 +20,7 @@ public class GameTree implements IGameTree{
         root = new GameTreeNode(gameState,round);
 
         long startTime = System.currentTimeMillis();
-        long endTime = startTime + SECS_PER_MOVE;
+        long endTime = startTime + secsForMove;
 
         buildChildren(root, root.getRound()+1, root.getState().getPlayerNumber(), endTime);
 

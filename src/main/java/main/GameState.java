@@ -150,6 +150,16 @@ public class GameState {
         return false;
     }
 
+    public int countUnclaimed(){
+        int count = 0;
+        for(int i = 0; i < 8; ++i){
+            for(int j = 0; j < 8; ++j){
+                if(state[i][j] == 0) ++count;
+            }
+        }
+        return count;
+    }
+
     public void display(){
         System.out.println("*** Printing state ***");
         StringBuilder sb = new StringBuilder();

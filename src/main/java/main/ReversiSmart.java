@@ -10,6 +10,7 @@ import java.util.Random;
  */
 public class ReversiSmart {
     private static final int BASE_PORT = 3333;
+    private static final int SECS_PER_GAME = 180000;
 
     private int playerNumber;
     private PlayerSocket socket;
@@ -18,6 +19,7 @@ public class ReversiSmart {
     private GameState state;
     private ValidMoves validMoves;
     private Random generator;
+    private int secsUsed;
 
     /**
      * Main method that establishes a connection and then moves whenever it is this player's turn
@@ -30,6 +32,7 @@ public class ReversiSmart {
         this.round = 0;
         this.state = new GameState(playerNumber);
         this.validMoves = null;
+        this.secsUsed = 0;
 
         // Establish the connection
         this.playerNumber = playerNumber;
@@ -38,18 +41,19 @@ public class ReversiSmart {
 
         // Move whenever it's this player's turn
         while(true){
-//            System.out.println("Read");
             updateState();
 
             if(this.turn == this.playerNumber){
                 // It is this player's turn
-//                System.out.println("Move");
+                long timerStart = System.currentTimeMillis();
+                int secsForMove = (SECS_PER_GAME - this.secsUsed) / this.state.countUnclaimed();
                 this.validMoves = this.state.getValidMoves(round);
 
-                int myMove = move();
+                int myMove = move(secsForMove);
                 String sel = validMoves.getValue(myMove) / 8 + "\n" + validMoves.getValue(myMove) % 8;
-//                System.out.println("Selection: " + validMoves.getValue(myMove) / 8 + ", " + validMoves.getValue(myMove) % 8);
                 this.socket.send(sel);
+                long timerEnd = System.currentTimeMillis();
+                this.secsUsed += (timerEnd - timerStart);
             }
         }
     }
@@ -58,11 +62,11 @@ public class ReversiSmart {
      * Determines what move to take. Moves randomly for now.
      * @return The index of the right move to make.
      */
-    private int move(){
+    private int move(int secsForMove){
         if(round < 4){
             return generator.nextInt(this.validMoves.getNumValidMoves());
         }
-        GameTree tree = new GameTree(state,round);
+        GameTree tree = new GameTree(state,round,secsForMove);
         IVisitor test = new Visitor();
         IGameTreeNode root = tree.getRoot();
         IGameTreeNode result = test.visit(root, Integer.MIN_VALUE, Integer.MAX_VALUE, true);
