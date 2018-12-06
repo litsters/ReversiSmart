@@ -12,6 +12,11 @@ public class GameTreeNode implements IGameTreeNode{
     private static final int FRONTIER_UTILITY = -10;
     private static final int MOVE_UTILITY = 1;
 
+    public static final int UPLEFT = 0;
+    public static final int UPRIGHT = 1;
+    public static final int DNLEFT = 2;
+    public static final int DNRIGHT = 3;
+
     GameState state;
     private int index;
     private int utility = 0;
@@ -134,63 +139,92 @@ public class GameTreeNode implements IGameTreeNode{
         return count;
     }
 
+    private boolean isControlled(int playerValue, int row, int col){
+        if(row < 0 || row > 7 || col < 0 || col > 7) return true;
+        return state.getValue(row, col) == playerValue;
+    }
+
+    public boolean spaceIsStable(int playerValue, int row, int col, int direction){
+        // If the space is off the board, it's stable
+        if(row < 0 || row > 7 || col < 0 || col > 7) return true;
+
+        // If the space isn't controlled by the player, it's not stable
+        if(!isControlled(playerValue, row, col)) return false;
+
+        // Check that required adjacent spaces are controlled to avoid wasting time
+        boolean controlled = false;
+        switch(direction){
+            case UPLEFT:
+                controlled = isControlled(playerValue, row-1,col) &&
+                        isControlled(playerValue,row-1,col-1) &&
+                        isControlled(playerValue,row,col-1) &&
+                        (isControlled(playerValue,row-1,col+1) || isControlled(playerValue,row+1,col-1));
+                break;
+            case UPRIGHT:
+                controlled = isControlled(playerValue,row-1,col) &&
+                        isControlled(playerValue,row-1,col+1) &&
+                        isControlled(playerValue,row,col+1) &&
+                        (isControlled(playerValue,row-1,col-1) || isControlled(playerValue,row+1,col+1));
+                break;
+            case DNLEFT:
+                controlled = isControlled(playerValue,row,col-1) &&
+                        isControlled(playerValue,row+1,col-1) &&
+                        isControlled(playerValue,row+1,col) &&
+                        (isControlled(playerValue,row-1,col-1) || isControlled(playerValue,row+1,col+1));
+                break;
+            case DNRIGHT:
+                controlled = isControlled(playerValue,row,col+1) &&
+                        isControlled(playerValue,row+1,col+1) &&
+                        isControlled(playerValue,row+1,col) &&
+                        (isControlled(playerValue,row-1,col+1) || isControlled(playerValue,row+1,col-1));
+                break;
+        }
+        if(!controlled) return false;
+
+        // Check that the adjacent spaces are also stable
+        switch(direction){
+            case UPLEFT:
+                return spaceIsStable(playerValue, row-1,col,direction) &&
+                    spaceIsStable(playerValue,row-1,col-1,direction) &&
+                    spaceIsStable(playerValue,row,col-1,direction) &&
+                    (spaceIsStable(playerValue,row-1,col+1,direction) || spaceIsStable(playerValue,row+1,col-1,direction));
+            case UPRIGHT:
+                return spaceIsStable(playerValue,row-1,col,direction) &&
+                        spaceIsStable(playerValue,row-1,col+1,direction) &&
+                        spaceIsStable(playerValue,row,col+1,direction) &&
+                        (spaceIsStable(playerValue,row-1,col-1,direction) || spaceIsStable(playerValue,row+1,col+1,direction));
+            case DNLEFT:
+                return spaceIsStable(playerValue,row,col-1,direction) &&
+                        spaceIsStable(playerValue,row+1,col-1,direction) &&
+                        spaceIsStable(playerValue,row+1,col,direction) &&
+                        (spaceIsStable(playerValue,row-1,col-1,direction) || spaceIsStable(playerValue,row+1,col+1,direction));
+            case DNRIGHT:
+                return spaceIsStable(playerValue,row,col+1,direction) &&
+                        spaceIsStable(playerValue,row+1,col+1,direction) &&
+                        spaceIsStable(playerValue,row+1,col,direction) &&
+                        (spaceIsStable(playerValue,row-1,col+1,direction) || spaceIsStable(playerValue,row+1,col-1,direction));
+            default: return false;
+        }
+    }
+
     public int numStable(GameState state){
         int playerNumber = UTILITY_PLAYER_NUMBER;
-        // Initialize array for tracking checks
-        boolean[][] checked = new boolean[8][8];
-        for(int i = 0; i < 8; ++i)for(int j = 0; j < 8; ++j) checked[i][j] = false;
 
         int count = 0;
-        // Check 0,0 corner
-        if(state.getValue(0,0) == playerNumber){
-            for(int i = 0; i < 8; ++i){
-                if(state.getValue(i,0) != playerNumber || checked[i][0]) break;    // Need to control the first spot in each row
-                for(int j = 0; j < 8; ++j){
-                    if(state.getValue(i,j) != playerNumber || checked[i][j]) break;
-                    else{
-                        ++count;
-                        checked[i][j] = true;
-                    }
+        for(int row = 0; row < 8; ++row){
+            for(int col = 0; col < 8; ++col){
+                boolean stable = false;
+                if(spaceIsStable(playerNumber,row,col,UPLEFT)){
+                    stable = true;
+                } else if(spaceIsStable(playerNumber,row,col,UPRIGHT)){
+                    stable = true;
+                } else if(spaceIsStable(playerNumber,row,col,DNLEFT)){
+                    stable = true;
+                } else if(spaceIsStable(playerNumber,row,col,DNRIGHT)){
+                    stable = true;
                 }
-            }
-        }
-        // Check 0,7 corner
-        if(state.getValue(0,7) == playerNumber){
-            for(int i = 0; i < 8; ++i){
-                if(state.getValue(i,0) != playerNumber || checked[i][0]) break;    // Need to control the last spot in each row
-                for(int j = 7; j >= 0; --j){
-                    if(state.getValue(i,j) != playerNumber || checked[i][j]) break;
-                    else{
-                        ++count;
-                        checked[i][j] = true;
-                    }
-                }
-            }
-        }
-        // Check 7,0 corner
-        if(state.getValue(7,0) == playerNumber){
-            for(int i = 7; i >= 0; --i){
-                if(state.getValue(i,0) != playerNumber || checked[i][0]) break;    // Need to control the first spot in each row
-                for(int j = 0; j < 8; ++j){
-                    if(state.getValue(i,j) != playerNumber || checked[i][j]) break;
-                    else{
-                        ++count;
-                        checked[i][j] = true;
-                    }
-                }
-            }
-        }
-        // Check 7,7 corner
-        if(state.getValue(7,7) == playerNumber){
-            for(int i = 7; i >= 0; --i){
-                if(state.getValue(i, 7) != playerNumber || checked[i][7]) break;   // Need to control the last spot in each row
-                for(int j = 7; j >= 0; --j){
-                    if(state.getValue(i,j) != playerNumber || checked[i][j]) break;
-                    else {
-                        ++count;
-                        checked[i][j] = true;
-                    }
-                }
+
+                if(stable) ++count;
             }
         }
 

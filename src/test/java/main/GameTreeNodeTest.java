@@ -41,7 +41,7 @@ public class GameTreeNodeTest {
         assertTrue(test.numStable(state) == 0);
         assertTrue(test.numMoves(state) == 6);
         assertTrue(test.numStupid(state) == 1);
-        assertTrue(test.getUtility() == -100000);
+        assertTrue(test.getUtility() == -2534);
     }
 
     @Test
@@ -65,7 +65,7 @@ public class GameTreeNodeTest {
         assertTrue(test.numStable(state) == 0);
         assertTrue(test.numMoves(state) == 6);
         assertTrue(test.numStupid(state) == 1);
-        assertTrue(test.getUtility() == -100000);
+        assertTrue(test.getUtility() == -2564);
     }
 
     @Test
@@ -141,11 +141,11 @@ public class GameTreeNodeTest {
 
         // Test 5: Add a vertically adjacent space
         state.setValue(1,1,0);
-        assertTrue(test.numStable(state) == 4);
+        assertTrue(test.numStable(state) == 3);
 
         // Test 6: Add a separated space
         state.setValue(1,3,0);
-        assertTrue(test.numStable(state) == 4);
+        assertTrue(test.numStable(state) == 3);
 
         // Test 7: Add a whole row
         state.setValue(1,0,2);
@@ -159,6 +159,49 @@ public class GameTreeNodeTest {
         // Test 8: Add another corner
         state.setValue(1,7,7);
         assertTrue(test.numStable(state) == 11);
+    }
+
+    @Test
+    public void bugTest() throws Exception{
+        GameTreeNode.UTILITY_PLAYER_NUMBER = 1;
+        int[][] grid = new int[8][8];
+        for(int i = 0; i < 8; ++i)for(int j = 0; j < 8; ++j)grid[i][j] = 0;
+
+        GameState state = new GameState(1);
+        state.setStatesArray(grid);
+        GameTreeNode test = new GameTreeNode(state, 5);
+
+        state.setValue(1,0,0);
+        state.setValue(1,0,1);
+        state.setValue(1,1,0);
+        state.setValue(1,1,1);
+
+        assertTrue(test.spaceIsStable(1,0,0,GameTreeNode.UPLEFT));
+        assertTrue(test.spaceIsStable(1,0,1,GameTreeNode.UPLEFT));
+        assertTrue(test.spaceIsStable(1,1,0,GameTreeNode.UPLEFT));
+        assertTrue(!test.spaceIsStable(1,1,1,GameTreeNode.UPLEFT));
+
+        assertTrue(test.numStable(state) == 3);
+    }
+
+    @Test
+    public void stabilityTest() throws Exception{
+        int[][] grid = new int[8][8];
+        for(int i = 0; i < 8; ++i)for(int j = 0; j < 8; ++j)grid[i][j] = 0;
+
+        GameState state = new GameState(1);
+        state.setStatesArray(grid);
+        GameTreeNode test = new GameTreeNode(state, 5);
+
+        state.setValue(1,0,0);
+        state.setValue(1,0,1);
+        state.setValue(1,1,0);
+        state.setValue(1,1,1);
+
+        assertTrue(test.spaceIsStable(1,0,0,GameTreeNode.UPLEFT));
+        assertTrue(test.spaceIsStable(1,0,1,GameTreeNode.UPLEFT));
+        assertTrue(test.spaceIsStable(1,1,0,GameTreeNode.UPLEFT));
+        assertTrue(!test.spaceIsStable(1,1,1,GameTreeNode.UPLEFT));
     }
 
     @Test
