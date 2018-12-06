@@ -151,60 +151,132 @@ public class GameTreeNode implements IGameTreeNode{
         // If the space isn't controlled by the player, it's not stable
         if(!isControlled(playerValue, row, col)) return false;
 
-        // Check that required adjacent spaces are controlled to avoid wasting time
-        boolean controlled = false;
+        // Check if the space is stable
+        boolean stable = true;
         switch(direction){
             case UPLEFT:
-                controlled = isControlled(playerValue, row-1,col) &&
-                        isControlled(playerValue,row-1,col-1) &&
-                        isControlled(playerValue,row,col-1) &&
-                        (isControlled(playerValue,row-1,col+1) || isControlled(playerValue,row+1,col-1));
+                // Check if it's an edge
+                if(col == 0){
+                    for(int r = 0; r < row; ++r) if(!isControlled(playerValue,r,col)) stable = false;
+                }
+                if(row == 0){
+                    for(int c = 0; c < col; ++c) if(!isControlled(playerValue,row,c)) stable = false;
+                }
+                // Check that the block is controlled (rectangle from 0,0 to target space)
+                for(int r = 0; r < row; ++r){
+                    for(int c = 0; c < col; ++c){
+                        if(!isControlled(playerValue,r,c)) stable = false;
+                    }
+                }
+                // Check if upper wedge is controlled
+                boolean upperWedgeControlled = true;
+                for(int rowMod = 1; row - rowMod >= 0; ++rowMod){
+                    for(int colMod = 0; colMod <= rowMod; ++colMod){
+                        if(!isControlled(playerValue,row-rowMod,col+colMod)) upperWedgeControlled = false;
+                    }
+                }
+                // Check if lower wedge is controlled
+                boolean lowerWedgeControlled = true;
+                for(int colMod = 1; col - colMod >= 0; ++colMod){
+                    for(int rowMod = 0; rowMod <= colMod; ++rowMod){
+                        if(!isControlled(playerValue,row+rowMod,col-colMod)) lowerWedgeControlled = false;
+                    }
+                }
+                if(!upperWedgeControlled && !lowerWedgeControlled) stable = false;
                 break;
             case UPRIGHT:
-                controlled = isControlled(playerValue,row-1,col) &&
-                        isControlled(playerValue,row-1,col+1) &&
-                        isControlled(playerValue,row,col+1) &&
-                        (isControlled(playerValue,row-1,col-1) || isControlled(playerValue,row+1,col+1));
+                // Check if it's an edge
+                if(col == 7){
+                    for(int r = 0; r < row; ++r) if(!isControlled(playerValue,r,col)) stable = false;
+                }
+                if(row == 0){
+                    for(int c = 7; c > col; --c) if(!isControlled(playerValue,row,c)) stable = false;
+                }
+                // Check that the block is controlled (rectangle from 0,7 to target space)
+                for(int r = row-1; r >= 0; --r){
+                    for(int c = col; c < 8; ++c){
+                        if(!isControlled(playerValue,r,c)) stable = false;
+                    }
+                }
+                // Check if upper wedge is controlled
+                upperWedgeControlled = true;
+                for(int rowMod = 1; row - rowMod >= 0; ++rowMod){
+                    for(int colMod = 0; colMod <= rowMod; ++colMod){
+                        if(!isControlled(playerValue,row-rowMod,col-colMod)) upperWedgeControlled = false;
+                    }
+                }
+                // Check if lower wedge is controlled
+                lowerWedgeControlled = true;
+                for(int colMod = 1; col + colMod < 8; ++colMod){
+                    for(int rowMod = 0; rowMod <= colMod; ++rowMod){
+                        if(!isControlled(playerValue,row+rowMod,col+colMod)) lowerWedgeControlled = false;
+                    }
+                }
+                if(!upperWedgeControlled && !lowerWedgeControlled) stable = false;
                 break;
             case DNLEFT:
-                controlled = isControlled(playerValue,row,col-1) &&
-                        isControlled(playerValue,row+1,col-1) &&
-                        isControlled(playerValue,row+1,col) &&
-                        (isControlled(playerValue,row-1,col-1) || isControlled(playerValue,row+1,col+1));
+                // Check if it's an edge
+                if(row == 7){
+                    for(int c = 0; c < col; ++c) if(!isControlled(playerValue,row,c)) stable = false;
+                }
+                if(col == 0){
+                    for(int r = 7; r > row; --r) if(!isControlled(playerValue,r,col)) stable = false;
+                }
+                // Check that the block is controlled (rectangle from 7,0 to target space)
+                for(int r = 7; r > row; --r){
+                    for(int c = 0; c < col; ++c){
+                        if(!isControlled(playerValue,r,c)) stable = false;
+                    }
+                }
+                // Check if upper wedge is controlled
+                upperWedgeControlled = true;
+                for(int colMod = 1; col - colMod >= 0; ++colMod){
+                    for(int rowMod = 0; rowMod <= colMod; ++rowMod){
+                        if(!isControlled(playerValue,row-rowMod,col-colMod)) upperWedgeControlled = false;
+                    }
+                }
+                // Check if lower wedge is controlled
+                lowerWedgeControlled = true;
+                for(int rowMod = 1; row + rowMod < 8; ++rowMod){
+                    for(int colMod = 0; colMod <= rowMod; ++colMod){
+                        if(!isControlled(playerValue,row+rowMod,col+colMod)) lowerWedgeControlled = false;
+                    }
+                }
+                if(!upperWedgeControlled && !lowerWedgeControlled) stable = false;
                 break;
             case DNRIGHT:
-                controlled = isControlled(playerValue,row,col+1) &&
-                        isControlled(playerValue,row+1,col+1) &&
-                        isControlled(playerValue,row+1,col) &&
-                        (isControlled(playerValue,row-1,col+1) || isControlled(playerValue,row+1,col-1));
+                // Check if it's an edge
+                if(row == 7){
+                    for(int c = 7; c > col; ++c) if(!isControlled(playerValue,row,c)) stable = false;
+                }
+                if(col == 7){
+                    for(int r = 7; r > row; --r) if(!isControlled(playerValue,r,col)) stable = false;
+                }
+                // Check that the block is controlled (rectangle from 7,7 to target space)
+                for(int r = 7; r > row; --r){
+                    for(int c = 7; c > col; --c){
+                        if(!isControlled(playerValue,r,c)) stable = false;
+                    }
+                }
+                // Check if upper wedge is controlled
+                upperWedgeControlled = true;
+                for(int colMod = 1; col + colMod < 8; ++colMod){
+                    for(int rowMod = 0; rowMod <= colMod; ++rowMod){
+                        if(!isControlled(playerValue,row-rowMod,col+colMod)) upperWedgeControlled = false;
+                    }
+                }
+                // Check if lower wedge is controlled
+                lowerWedgeControlled = true;
+                for(int rowMod = 1; row + rowMod < 8; ++rowMod){
+                    for(int colMod = 0; colMod <= rowMod; ++colMod){
+                        if(!isControlled(playerValue,row+rowMod,col-colMod)) lowerWedgeControlled = false;
+                    }
+                }
+                if(!upperWedgeControlled && !lowerWedgeControlled) stable = false;
                 break;
         }
-        if(!controlled) return false;
 
-        // Check that the adjacent spaces are also stable
-        switch(direction){
-            case UPLEFT:
-                return spaceIsStable(playerValue, row-1,col,direction) &&
-                    spaceIsStable(playerValue,row-1,col-1,direction) &&
-                    spaceIsStable(playerValue,row,col-1,direction) &&
-                    (spaceIsStable(playerValue,row-1,col+1,direction) || spaceIsStable(playerValue,row+1,col-1,direction));
-            case UPRIGHT:
-                return spaceIsStable(playerValue,row-1,col,direction) &&
-                        spaceIsStable(playerValue,row-1,col+1,direction) &&
-                        spaceIsStable(playerValue,row,col+1,direction) &&
-                        (spaceIsStable(playerValue,row-1,col-1,direction) || spaceIsStable(playerValue,row+1,col+1,direction));
-            case DNLEFT:
-                return spaceIsStable(playerValue,row,col-1,direction) &&
-                        spaceIsStable(playerValue,row+1,col-1,direction) &&
-                        spaceIsStable(playerValue,row+1,col,direction) &&
-                        (spaceIsStable(playerValue,row-1,col-1,direction) || spaceIsStable(playerValue,row+1,col+1,direction));
-            case DNRIGHT:
-                return spaceIsStable(playerValue,row,col+1,direction) &&
-                        spaceIsStable(playerValue,row+1,col+1,direction) &&
-                        spaceIsStable(playerValue,row+1,col,direction) &&
-                        (spaceIsStable(playerValue,row-1,col+1,direction) || spaceIsStable(playerValue,row+1,col-1,direction));
-            default: return false;
-        }
+        return stable;
     }
 
     public int numStable(GameState state){

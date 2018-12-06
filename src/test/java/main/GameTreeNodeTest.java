@@ -2,6 +2,8 @@ package main;
 
 import org.junit.Test;
 
+import java.util.List;
+
 import static org.junit.Assert.*;
 
 /**
@@ -23,6 +25,7 @@ public class GameTreeNodeTest {
 
     @Test
     public void utilityTest2() throws Exception{
+        GameTreeNode.UTILITY_PLAYER_NUMBER = 2;
         int[][] grid = new int[][]{
                 {0,0,0,0,0,0,0,0},
                 {0,0,0,0,0,0,0,0},
@@ -70,6 +73,7 @@ public class GameTreeNodeTest {
 
     @Test
     public void frontierTest() throws Exception{
+        GameTreeNode.UTILITY_PLAYER_NUMBER = 1;
         int[][] grid = new int[8][8];
         for(int i = 0; i < 8; ++i)for(int j = 0; j < 8; ++j)grid[i][j] = 0;
 
@@ -117,6 +121,7 @@ public class GameTreeNodeTest {
 
     @Test
     public void stableTest() throws Exception{
+        GameTreeNode.UTILITY_PLAYER_NUMBER = 1;
         int[][] grid = new int[8][8];
         for(int i = 0; i < 8; ++i)for(int j = 0; j < 8; ++j)grid[i][j] = 0;
 
@@ -144,7 +149,10 @@ public class GameTreeNodeTest {
         assertTrue(test.numStable(state) == 3);
 
         // Test 6: Add a separated space
+//        System.out.println("**********************************");
         state.setValue(1,3,0);
+//        System.out.println(test.numStable(state));
+//        System.out.println("**********************************");
         assertTrue(test.numStable(state) == 3);
 
         // Test 7: Add a whole row
@@ -185,7 +193,56 @@ public class GameTreeNodeTest {
     }
 
     @Test
+    public void rowTest() throws Exception{
+        GameTreeNode.UTILITY_PLAYER_NUMBER = 1;
+        int[][] grid = new int[8][8];
+        for(int i = 0; i < 8; ++i)for(int j = 0; j < 8; ++j)grid[i][j] = 0;
+
+        GameState state = new GameState(1);
+        state.setStatesArray(grid);
+        GameTreeNode test = new GameTreeNode(state, 5);
+
+        state.setValue(1,0,0);
+        state.setValue(2,0,1);
+        assertTrue(test.numStable(state) == 1);
+
+        state.setValue(1,0,1);
+        state.setValue(1,0,2);
+        assertTrue(test.numStable(state) == 3);
+    }
+
+//    @Test
+//    public void bizarreChoicesTest() throws Exception{
+//        // This test is testing what happened in a specific game situation
+//        GameTreeNode.UTILITY_PLAYER_NUMBER = 1;
+//        int[][] grid = new int[][]{
+//                {1,2,0,1,0,0,0,0},
+//                {0,1,2,1,2,0,0,0},
+//                {0,0,2,1,1,0,0,0},
+//                {0,2,2,2,2,2,2,2},
+//                {0,0,0,2,1,2,2,0},
+//                {0,0,0,0,2,2,2,0},
+//                {0,0,0,0,0,2,0,0},
+//                {0,0,0,0,0,0,0,0}
+//        };
+//
+//        GameState state = new GameState(1);
+//        state.setStatesArray(grid);
+//        GameTreeNode test = new GameTreeNode(state, 5);
+//
+//
+//        GameTree testTree = new GameTree(state,5);
+//        IGameTreeNode root = testTree.getRoot();
+//        List<IGameTreeNode> children = root.getChildren();
+//        System.out.println(children.size());
+//        for(IGameTreeNode n : children){
+//            n.getState().display();
+//        }
+//    }
+
+    @Test
     public void stabilityTest() throws Exception{
+        GameTreeNode.UTILITY_PLAYER_NUMBER = 1;
         int[][] grid = new int[8][8];
         for(int i = 0; i < 8; ++i)for(int j = 0; j < 8; ++j)grid[i][j] = 0;
 

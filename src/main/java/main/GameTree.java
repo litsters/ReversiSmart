@@ -22,46 +22,45 @@ public class GameTree implements IGameTree{
         long startTime = System.currentTimeMillis();
         long endTime = startTime + SECS_PER_MOVE;
 
-        buildChildren(root, root.getRound()+1, root.getState().getPlayerNumber());
+        buildChildren(root, root.getRound()+1, root.getState().getPlayerNumber(), endTime);
 
         //This code works for three levels
-        for (IGameTreeNode node : root.getChildren()) {
-            buildChildren(node, node.getRound()+1, node.getState().getPlayerNumber());
-            if(node.getChildren() != null) {
-                for (IGameTreeNode node2 : node.getChildren()) {
-                    buildChildren(node2, node2.getRound() + 1, node2.getState().getPlayerNumber());
-                }
-            }
-        }
+//        for (IGameTreeNode node : root.getChildren()) {
+//            buildChildren(node, node.getRound()+1, node.getState().getPlayerNumber());
+//            if(node.getChildren() != null) {
+//                for (IGameTreeNode node2 : node.getChildren()) {
+//                    buildChildren(node2, node2.getRound() + 1, node2.getState().getPlayerNumber());
+//                }
+//            }
+//        }
 
         IGameTreeNode node = queue.poll();
         while(System.currentTimeMillis() < endTime && node != null){
             if(maxInQueue < queue.size()) maxInQueue = queue.size();
-            buildChildren(node, node.getRound() + 1, node.getState().getPlayerNumber());
+            buildChildren(node, node.getRound() + 1, node.getState().getPlayerNumber(), endTime);
             node = queue.poll();
         }
 
         System.out.println("Max in queue = " + maxInQueue);
     }
 
-    private void buildChildren(IGameTreeNode node, int round, int playerNumber){
+    private void buildChildren(IGameTreeNode node, int round, int playerNumber, long endTime){
         List<IGameTreeNode> children = new ArrayList<>();
         ValidMoves validMoves = node.getState().getValidMoves(round);
         int numValidMoves = node.getState().getValidMoves(round).getNumValidMoves();
 
-        for( int i = 0; i < numValidMoves; i++){
+        for(int i = 0; i < numValidMoves; i++){
+            if(System.currentTimeMillis() >= endTime) break;
             int index = validMoves.getValue(i);
             int col  = index % 8;
             int row = index / 8;
 
             int childNodePlayerNumber = ((playerNumber + 1) % 3 == 0) ? 1 : 2 ;
-//            int childNodePlayerNumber = playerNumber;
 
             GameState gameState = new GameState(childNodePlayerNumber);
             int [][] tempStatesArray = copyArray(node.getState().getStatesArray());
 
             gameState.setStatesArray(tempStatesArray);
-//            gameState.setValue(childNodePlayerNumber, row, col);
             gameState.setValue(playerNumber, row, col);
             // now identify any flipped spaces
             List<Space> toFlip = new ArrayList<>();
@@ -98,7 +97,6 @@ public class GameTree implements IGameTree{
             toFlip.addAll(temp);
 
             // Flip all spaces
-//            System.out.println("to flip = " + toFlip.size());
             for(Space space : toFlip) gameState.setValue(playerNumber, space.row, space.col);
 
             GameTreeNode tempNode = new GameTreeNode(gameState,round);
@@ -115,12 +113,9 @@ public class GameTree implements IGameTree{
         List<Space> toFlip = new ArrayList<>();
         int r = row;
         int c = col;
-//        System.out.println("Started at " + row + "," + col + "; incrow = " + incRow + ", inccol = " + incCol);
         while(r >= 0 && r < 8 && c >= 0 && c < 8){
             // iterate until you come to a blank space, your own piece, or the edge of the board
-//            System.out.println("  examining " + r + "," + c);
             if(r == row && c == col){
-//                System.out.println("    skipping!");
                 r += incRow;
                 c += incCol;
                 continue;
@@ -128,17 +123,10 @@ public class GameTree implements IGameTree{
             int value = state.getValue(r, c);
             if(value == 0){
                 // blank space; nothing to capture
-//                System.out.println("    blank!");
                 toFlip = new ArrayList<>();
                 break;
             } else if(value == playerNumber){
                 // your own space; we're done
-//                System.out.println("    mine!");
-                break;
-            } else if(r == 7 || c == 7 || r == 0 || c == 0){
-                // reached the edge without encountering your own piece; nothing to capture
-//                System.out.println("    edge!");
-                toFlip = new ArrayList<>();
                 break;
             } else {
                 // this is an enemy space; keep going
@@ -148,6 +136,7 @@ public class GameTree implements IGameTree{
             r += incRow;
             c += incCol;
         }
+        if(r < 0 || r > 7 || c < 0 || c > 7) toFlip = new ArrayList<>();    // Went out of bounds
         return toFlip;
     }
 
