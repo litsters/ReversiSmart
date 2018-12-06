@@ -10,7 +10,7 @@ public class GameTree implements IGameTree{
     private Queue<IGameTreeNode> queue;
     private int maxInQueue = 0;
 
-    public GameTree(GameState state, int round, int secsForMove) {
+    public GameTree(GameState state, int round, long secsForMove) {
         queue = new LinkedList<>();
 
         GameState gameState = new GameState(state.getPlayerNumber());
