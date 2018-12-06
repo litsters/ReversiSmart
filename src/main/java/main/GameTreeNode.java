@@ -12,6 +12,7 @@ public class GameTreeNode implements IGameTreeNode{
     private static final int FRONTIER_UTILITY = -10;
     private static final int MOVE_UTILITY = 1;
     private static final int EDGE_UTILITY = 25;
+    private static final int CONTROL_UTILITY = 1;
 
     public static final int UPLEFT = 0;
     public static final int UPRIGHT = 1;
@@ -90,7 +91,22 @@ public class GameTreeNode implements IGameTreeNode{
         utility += numMoves(state) * MOVE_UTILITY;
         utility += numStupid(state) * STUPIDITY_UTILITY;
         utility += numEdge(state, UTILITY_PLAYER_NUMBER) * EDGE_UTILITY;
+        utility += controlSquare(state) * CONTROL_UTILITY;
     }
+
+    public int controlSquare(GameState state){
+        int count = 0;
+        if(state.getValue(2,0) == UTILITY_PLAYER_NUMBER) ++count;
+        if(state.getValue(0,2) == UTILITY_PLAYER_NUMBER) ++count;
+        if(state.getValue(5,0) == UTILITY_PLAYER_NUMBER) ++count;
+        if(state.getValue(0,5) == UTILITY_PLAYER_NUMBER) ++count;
+        if(state.getValue(2,7) == UTILITY_PLAYER_NUMBER) ++count;
+        if(state.getValue(7,2) == UTILITY_PLAYER_NUMBER) ++count;
+        if(state.getValue(5,7) == UTILITY_PLAYER_NUMBER) ++count;
+        if(state.getValue(7,5) == UTILITY_PLAYER_NUMBER) ++count;
+        return count;
+    }
+
 
     /**
      * Counts all edge pieces controlled by the player that aren't in immediate danger of being captured.
