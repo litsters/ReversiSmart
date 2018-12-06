@@ -100,20 +100,117 @@ public class GameTreeNode implements IGameTreeNode{
     public int numEdge(GameState state, int playerNumber){
         int count = 0;
 
-//        // Check left edge
-//        for(int row = 0; row < 8; ++row){
-//            // Look for consecutive groups controlled by player not adjacent to an enemy piece
-//            if(state.getValue(row,0) == 0) continue;    // Continue past empty spaces
-//            else if(state.getValue(row,0) != playerNumber){
-//                // Enemy space encountered. Skip the next consecutive group of controlled spaces.
-//                while(state.getValue(row,0))
-//            } else {
-//                // Space is controlled. Count all consecutive pieces, provided they don't end with an enemy space.
-//            }
-//        }
+        // Check left edge
+        for(int row = 0; row < 8; ++row){
+            // Look for consecutive groups controlled by player not adjacent to an enemy piece
+            if(state.getValue(row,0) == 0) continue;    // Continue past empty spaces
+            else if(state.getValue(row,0) != playerNumber){
+                // Enemy space encountered. Skip the next consecutive group of controlled spaces.
+                ++row;
+                int startRow = row;
+                while(row < 8 && state.getValue(row,0) == playerNumber)++row;
+                if(row == 8){
+                    // They are saved by the edge of the board; count the spaces!
+                    count += row - startRow;
+                }
+            } else {
+                // Space is controlled. Count all consecutive pieces, provided they don't end with an enemy space.
+                int consecCount = 0;
+                int startRow = row;
+                while(row < 8 && state.getValue(row,0) == playerNumber){
+                    ++consecCount;
+                    ++row;
+                }
+                if(row < 8 && state.getValue(row,0) != 0 && startRow != 0) consecCount = 0;
+                count += consecCount;
+            }
+        }
+
+        // Check top edge
+        for(int col = 0; col < 8; ++col){
+            // Look for consecutive groups controlled by player not adjacent to an enemy piece
+            if(state.getValue(0,col) == 0)continue;
+            else if(state.getValue(0,col) != playerNumber){
+                ++col;
+                int startCol = col;
+                while(col < 8 && state.getValue(0,col) == playerNumber) ++col;
+                if(col == 8) count += col - startCol;
+            } else {
+                int consecCount = 0;
+                int startCol = col;
+                while(col < 8 && state.getValue(0,col) == playerNumber){
+                    ++consecCount;
+                    ++col;
+                }
+                if(col < 8 && state.getValue(0,col) != 0 && startCol != 0) consecCount = 0;
+                count += consecCount;
+            }
+        }
+
+        // Check right edge
+        for(int row = 0; row < 8; ++row){
+            // Look for consecutive groups controlled by player not adjacent to an enemy piece
+            if(state.getValue(row,7) == 0) continue;    // Continue past empty spaces
+            else if(state.getValue(row,7) != playerNumber){
+                // Enemy space encountered. Skip the next consecutive group of controlled spaces.
+                ++row;
+                int startRow = row;
+                while(row < 8 && state.getValue(row,7) == playerNumber)++row;
+                if(row == 8){
+                    // They are saved by the edge of the board; count the spaces!
+                    count += row - startRow;
+                }
+            } else {
+                // Space is controlled. Count all consecutive pieces, provided they don't end with an enemy space.
+                int consecCount = 0;
+                int startRow = row;
+                while(row < 8 && state.getValue(row,7) == playerNumber){
+                    ++consecCount;
+                    ++row;
+                }
+                if(row < 8 && state.getValue(row,7) != 0 && startRow != 0) consecCount = 0;
+                count += consecCount;
+            }
+        }
+
+        // Check bottom edge
+        for(int col = 0; col < 8; ++col){
+            // Look for consecutive groups controlled by player not adjacent to an enemy piece
+            if(state.getValue(7,col) == 0)continue;
+            else if(state.getValue(7,col) != playerNumber){
+                ++col;
+                int startCol = col;
+                while(col < 8 && state.getValue(7,col) == playerNumber) ++col;
+                if(col == 8) count += col - startCol;
+            } else {
+                int consecCount = 0;
+                int startCol = col;
+                while(col < 8 && state.getValue(7,col) == playerNumber){
+                    ++consecCount;
+                    ++col;
+                }
+                if(col < 8 && state.getValue(7,col) != 0 && startCol != 0) consecCount = 0;
+                count += consecCount;
+            }
+        }
+
+        // Account for double-counted spaces
+        if(state.getValue(0,0) == playerNumber) --count;
+        if(state.getValue(0,7) == playerNumber) --count;
+        if(state.getValue(7,0) == playerNumber) --count;
+        if(state.getValue(7,7) == playerNumber) --count;
 
         return count;
     }
+
+//    public int safeInDirection(GameState state, int row, int col, int rMod, int cMod, int playerNumber){
+//        int count = 0;
+//        for(int r = row; r < 8; r+=rMod){
+//            for(int c = col; c < 8; c+=cMod){
+//                // Look for consecutive
+//            }
+//        }
+//    }
 
     public int numStupid(GameState state){
         int count = 0;

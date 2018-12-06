@@ -211,6 +211,75 @@ public class GameTreeNodeTest {
         assertTrue(test.numStable(state) == 3);
     }
 
+    @Test
+    public void edgeCountTest() throws Exception{
+        GameTreeNode.UTILITY_PLAYER_NUMBER = 1;
+        int[][] grid = new int[8][8];
+        for(int i = 0; i < 8; ++i)for(int j = 0; j < 8; ++j)grid[i][j] = 0;
+
+        GameState state = new GameState(1);
+        state.setStatesArray(grid);
+        GameTreeNode test = new GameTreeNode(state, 5);
+
+        assertTrue(test.numEdge(state,1) == 0);
+
+        /*
+        Check left edge counting
+         */
+        state.setValue(1,0,0);
+        assertTrue(test.numEdge(state,1) == 1);
+
+        state.setValue(1,1,0);
+        assertTrue(test.numEdge(state,1) == 2);
+
+        state.setValue(2,0,0);
+        assertTrue(test.numEdge(state,1) == 0);
+
+        state.setValue(0,0,0);
+        assertTrue(test.numEdge(state,1) == 1);
+
+        state.setValue(2,2,0);
+        assertTrue(test.numEdge(state,1) == 0);
+
+        state.setValue(2,7,0);
+        assertTrue(test.numEdge(state,1) == 0);
+
+        state.setValue(2,6,0);
+        state.setValue(1,7,0);
+        assertTrue(test.numEdge(state,1) == 1);
+
+        state.setValue(2,5,0);
+        state.setValue(1,6,0);
+        state.setValue(0,7,0);
+        assertTrue(test.numEdge(state,1) == 0);
+    }
+
+    @Test
+    public void topRowCount(){
+        GameTreeNode.UTILITY_PLAYER_NUMBER = 1;
+        int[][] grid = new int[8][8];
+        for(int i = 0; i < 8; ++i)for(int j = 0; j < 8; ++j)grid[i][j] = 0;
+
+        GameState state = new GameState(1);
+        state.setStatesArray(grid);
+        GameTreeNode test = new GameTreeNode(state, 5);
+
+        assertTrue(test.numEdge(state,1) == 0);
+
+        /*
+        Check top row counting
+         */
+        state.setValue(1,0,0);
+        assertTrue(test.numEdge(state,1) == 1);
+
+        state.setValue(2,0,1);
+        assertTrue(test.numEdge(state,1) == 1);
+
+        state.setValue(2,0,0);
+        state.setValue(1,0,1);
+        assertTrue(test.numEdge(state,1) == 0);
+    }
+
 //    @Test
 //    public void bizarreChoicesTest() throws Exception{
 //        // This test is testing what happened in a specific game situation
