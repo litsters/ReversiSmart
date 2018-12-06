@@ -142,6 +142,7 @@ public class GameTree implements IGameTree{
     }
 
     List<IGameTreeNode> pruneStupid(List<IGameTreeNode> nodeList){
+//        System.out.println("Pruning stupid: started with " + nodeList.size() + " children");
         List<IGameTreeNode> unstupid = new ArrayList<>();
         // Only take the nodes that don't have stupid moves
         for(IGameTreeNode n : nodeList){
@@ -150,6 +151,7 @@ public class GameTree implements IGameTree{
         }
         // If no nodes were added, take only the one with the greatest utility
         if(unstupid.size() == 0){
+//            System.out.println("No unstupid options available!");
             int minStupid = Integer.MAX_VALUE;
             int indx = -1;
             for(int i = 0; i < nodeList.size(); ++i){
@@ -162,6 +164,7 @@ public class GameTree implements IGameTree{
             if(indx > -1) unstupid.add(nodeList.get(indx));
         }
 
+//        System.out.println("Done pruning stupid: " + unstupid.size() + " remaining");
         return unstupid;
     }
 
