@@ -20,12 +20,13 @@ public class GameTree implements IGameTree{
         root = new GameTreeNode(gameState,round);
 
         long startTime = System.currentTimeMillis();
-        long endTime = startTime + secsForMove;
+        long endTime = startTime + SECS_PER_MOVE;
+        System.out.println("building children!");
 
         buildChildren(root, root.getRound()+1, root.getState().getPlayerNumber(), endTime);
 
         // Check if there is a child already that increases the number of stable spaces; if so,
-        // just only allow the child with the greatest increase of stable spaces.
+        // only allow the child with the greatest increase of stable spaces.
         if(seizeStable()){
             System.out.println("Seizing stable spaces");
             return;
@@ -52,6 +53,27 @@ public class GameTree implements IGameTree{
     }
 
     private boolean seizeStable(){
+        System.out.println("Seizing stable!");
+        // First see if a corner can be taken
+        int curCorners = root.numCorners(root.getState(), root.getState().getPlayerNumber());
+        System.out.println("Current corners = " + curCorners);
+        IGameTreeNode bestCorners = null;
+        for(IGameTreeNode n : queue){
+            GameTreeNode node = (GameTreeNode)n;
+            if(node.numCorners(node.getState(), node.getState().getPlayerNumber()) > curCorners){
+                bestCorners = node;
+                System.out.println("  Found node w/ better corner control");
+            }
+        }
+        if(bestCorners != null){
+            System.out.println("  Updating queue w/ better corner control");
+            LinkedList<IGameTreeNode> updated = new LinkedList<>();
+            updated.add(bestCorners);
+            queue = updated;
+            return true;
+        }
+
+        // No gain in corners, check for gain in stable spaces
         int curStable = root.numStable(root.getState());
         int maxGain = 0;
         int indx = -1;
@@ -73,10 +95,16 @@ public class GameTree implements IGameTree{
         } else return false;
     }
 
+    private int switchPlayer(int playerNumber){
+        if(playerNumber == 1) return 2;
+        else return 1;
+    }
+
     private void buildChildren(IGameTreeNode node, int round, int playerNumber, long endTime){
         List<IGameTreeNode> children = new ArrayList<>();
         ValidMoves validMoves = node.getState().getValidMoves(round);
         int numValidMoves = node.getState().getValidMoves(round).getNumValidMoves();
+        System.out.println("Building children: valid moves = " + numValidMoves);
 
         for(int i = 0; i < numValidMoves; i++){
             if(System.currentTimeMillis() >= endTime) break;
@@ -84,7 +112,7 @@ public class GameTree implements IGameTree{
             int col  = index % 8;
             int row = index / 8;
 
-            int childNodePlayerNumber = ((playerNumber + 1) % 3 == 0) ? 1 : 2 ;
+            int childNodePlayerNumber = switchPlayer(playerNumber);
 
             GameState gameState = new GameState(childNodePlayerNumber);
             int [][] tempStatesArray = copyArray(node.getState().getStatesArray());
@@ -127,6 +155,9 @@ public class GameTree implements IGameTree{
 
             // Flip all spaces
             for(Space space : toFlip) gameState.setValue(playerNumber, space.row, space.col);
+
+            System.out.println("  Child state:");
+            gameState.display();
 
             GameTreeNode tempNode = new GameTreeNode(gameState,round);
             tempNode.setIndex(i);

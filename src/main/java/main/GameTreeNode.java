@@ -92,6 +92,11 @@ public class GameTreeNode implements IGameTreeNode{
         utility += numEdge(state, UTILITY_PLAYER_NUMBER) * EDGE_UTILITY;
     }
 
+    private int enemy(int playerNumber){
+        if(playerNumber == 1) return 2;
+        else return 1;
+    }
+
     /**
      * Counts all edge pieces controlled by the player that aren't in immediate danger of being captured.
      * @param state The state to use.
@@ -109,7 +114,7 @@ public class GameTreeNode implements IGameTreeNode{
                 ++row;
                 int startRow = row;
                 while(row < 8 && state.getValue(row,0) == playerNumber)++row;
-                if(row == 8){
+                if(row == 8 || state.getValue(row,0) == enemy(playerNumber)){
                     // They are saved by the edge of the board; count the spaces!
                     count += row - startRow;
                 }
@@ -134,7 +139,7 @@ public class GameTreeNode implements IGameTreeNode{
                 ++col;
                 int startCol = col;
                 while(col < 8 && state.getValue(0,col) == playerNumber) ++col;
-                if(col == 8) count += col - startCol;
+                if(col == 8 || state.getValue(0,col) == enemy(playerNumber)) count += col - startCol;
             } else {
                 int consecCount = 0;
                 int startCol = col;
@@ -156,7 +161,7 @@ public class GameTreeNode implements IGameTreeNode{
                 ++row;
                 int startRow = row;
                 while(row < 8 && state.getValue(row,7) == playerNumber)++row;
-                if(row == 8){
+                if(row == 8 || state.getValue(row,7) == enemy(playerNumber)){
                     // They are saved by the edge of the board; count the spaces!
                     count += row - startRow;
                 }
@@ -181,7 +186,7 @@ public class GameTreeNode implements IGameTreeNode{
                 ++col;
                 int startCol = col;
                 while(col < 8 && state.getValue(7,col) == playerNumber) ++col;
-                if(col == 8) count += col - startCol;
+                if(col == 8 || state.getValue(7,col) == enemy(playerNumber)) count += col - startCol;
             } else {
                 int consecCount = 0;
                 int startCol = col;
@@ -462,6 +467,15 @@ public class GameTreeNode implements IGameTreeNode{
             }
         }
 
+        return count;
+    }
+
+    public int numCorners(GameState state, int playerNumber){
+        int count = 0;
+        if(state.getValue(0,0) == playerNumber) ++count;
+        if(state.getValue(0,7) == playerNumber) ++count;
+        if(state.getValue(7,0) == playerNumber) ++count;
+        if(state.getValue(7,7) == playerNumber) ++count;
         return count;
     }
 

@@ -255,6 +255,24 @@ public class GameTreeNodeTest {
     }
 
     @Test
+    public void pinnedEdgeTest(){
+        GameTreeNode.UTILITY_PLAYER_NUMBER = 1;
+        int[][] grid = new int[8][8];
+        for(int i = 0; i < 8; ++i)for(int j = 0; j < 8; ++j)grid[i][j] = 0;
+
+        GameState state = new GameState(1);
+        state.setStatesArray(grid);
+        GameTreeNode test = new GameTreeNode(state, 5);
+
+        assertTrue(test.numEdge(state,1) == 0);
+
+        state.setValue(2,0,0);
+        state.setValue(1,1,0);
+        state.setValue(2,2,0);
+        assertTrue(test.numEdge(state,1) == 1);
+    }
+
+    @Test
     public void topRowCount(){
         GameTreeNode.UTILITY_PLAYER_NUMBER = 1;
         int[][] grid = new int[8][8];
@@ -328,6 +346,28 @@ public class GameTreeNodeTest {
         assertTrue(test.spaceIsStable(1,0,1,GameTreeNode.UPLEFT));
         assertTrue(test.spaceIsStable(1,1,0,GameTreeNode.UPLEFT));
         assertTrue(!test.spaceIsStable(1,1,1,GameTreeNode.UPLEFT));
+    }
+
+    @Test
+    public void stableRowTest(){
+        GameTreeNode.UTILITY_PLAYER_NUMBER = 1;
+        int[][] grid = new int[8][8];
+        for(int i = 0; i < 8; ++i)for(int j = 0; j < 8; ++j)grid[i][j] = 0;
+
+        GameState state = new GameState(1);
+        state.setStatesArray(grid);
+        GameTreeNode test = new GameTreeNode(state, 5);
+
+        state.setValue(1,0,7);
+        state.setValue(1,0,6);
+        state.setValue(2,0,5);
+        state.setValue(2,0,4);
+        assertTrue(test.numStable(state) == 2);
+
+        state.setValue(1,0,5);
+        state.setValue(1,0,4);
+        state.setValue(1,0,3);
+        assertTrue(test.numStable(state) == 5);
     }
 
     @Test

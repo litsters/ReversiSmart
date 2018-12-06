@@ -176,7 +176,7 @@ public class VisitorTest {
         GameState state8 = new GameState(2);
         state8.setStatesArray(grid8);
         GameTreeNode child8 = new GameTreeNode(state8, 9);
-        assertTrue(child8.getUtility() == -100000);
+        assertTrue(child8.getUtility() == -2523);
 
         List<IGameTreeNode> children = new ArrayList<>();
         children.add(child1);
@@ -193,6 +193,33 @@ public class VisitorTest {
         Visitor visitor = new Visitor();
         GameTreeNode result = (GameTreeNode)visitor.visit(test, Integer.MIN_VALUE, Integer.MAX_VALUE, true);
         assertTrue(result.getUtility() == -21);
+    }
+
+    @Test
+    public void seizeCornerTest(){
+        GameTreeNode.UTILITY_PLAYER_NUMBER = 2;
+        System.out.println("************************************");
+        int[][] grid = new int[][]{
+                {0,0,0,0,0,0,0,0},
+                {0,0,0,0,0,0,0,0},
+                {0,0,1,0,0,0,0,0},
+                {0,0,0,1,1,0,0,0},
+                {0,0,0,1,1,2,2,0},
+                {0,0,0,0,0,2,0,0},
+                {0,0,0,0,2,2,1,0},
+                {0,0,0,0,0,2,0,0}
+        };
+        GameState state = new GameState(2);
+        state.setStatesArray(grid);
+
+        GameTree tree = new GameTree(state, 5, 4000);
+
+        Visitor visitor = new Visitor();
+        GameTreeNode result = (GameTreeNode)visitor.visit(tree.getRoot(),Integer.MIN_VALUE, Integer.MAX_VALUE, true);
+
+        result.state.display();
+        System.out.println("************************************");
+
     }
 
     @Test
