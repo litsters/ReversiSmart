@@ -25,7 +25,7 @@ public class VisitorTest {
         };
         GameState state = new GameState(2);
         state.setStatesArray(originalgrid);
-        GameTree tree = new GameTree(state, 8);
+        GameTree tree = new GameTree(state, 8, 1000);
 
         // Visit it!
         Visitor visitor = new Visitor();

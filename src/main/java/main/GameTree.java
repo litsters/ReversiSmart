@@ -24,6 +24,13 @@ public class GameTree implements IGameTree{
 
         buildChildren(root, root.getRound()+1, root.getState().getPlayerNumber(), endTime);
 
+        // Check if there is a child already that increases the number of stable spaces; if so,
+        // just only allow the child with the greatest increase of stable spaces.
+        if(seizeStable()){
+            System.out.println("Seizing stable spaces");
+            return;
+        }
+
         //This code works for three levels
 //        for (IGameTreeNode node : root.getChildren()) {
 //            buildChildren(node, node.getRound()+1, node.getState().getPlayerNumber());
@@ -42,6 +49,28 @@ public class GameTree implements IGameTree{
         }
 
         System.out.println("Max in queue = " + maxInQueue);
+    }
+
+    private boolean seizeStable(){
+        int curStable = root.numStable(root.getState());
+        int maxGain = 0;
+        int indx = -1;
+        for(int i = 0; i < queue.size(); ++i){
+            GameTreeNode node = (GameTreeNode)((LinkedList<IGameTreeNode>)queue).get(i);
+            int gain = node.numStable(node.getState()) - curStable;
+            if(gain > maxGain){
+                maxGain = gain;
+                indx = i;
+            }
+        }
+        if(indx > -1){
+            // Prune all but the one that had the greatest gain
+            LinkedList<IGameTreeNode> updated = new LinkedList<>();
+            IGameTreeNode n = ((LinkedList<IGameTreeNode>)queue).get(indx);
+            updated.add(n);
+            queue = updated;
+            return true;
+        } else return false;
     }
 
     private void buildChildren(IGameTreeNode node, int round, int playerNumber, long endTime){
@@ -102,11 +131,38 @@ public class GameTree implements IGameTree{
             GameTreeNode tempNode = new GameTreeNode(gameState,round);
             tempNode.setIndex(i);
             children.add(tempNode);
-            queue.add(tempNode);
         }
         if(numValidMoves > 0) {
+            // Eliminate all children with stupid moves, unless all of them do (in which case, leave the one that is
+            // least stupid)
+            children = pruneStupid(children);
             node.setChildren(children);
+            queue.addAll(children);
         }
+    }
+
+    List<IGameTreeNode> pruneStupid(List<IGameTreeNode> nodeList){
+        List<IGameTreeNode> unstupid = new ArrayList<>();
+        // Only take the nodes that don't have stupid moves
+        for(IGameTreeNode n : nodeList){
+            GameTreeNode node = (GameTreeNode)n;
+            if(node.numStupid(node.getState()) == 0) unstupid.add(n);
+        }
+        // If no nodes were added, take only the one with the greatest utility
+        if(unstupid.size() == 0){
+            int minStupid = Integer.MAX_VALUE;
+            int indx = -1;
+            for(int i = 0; i < nodeList.size(); ++i){
+                GameTreeNode node = (GameTreeNode)nodeList.get(i);
+                if(node.numStupid(node.getState()) < minStupid){
+                    indx = i;
+                    minStupid = node.numStupid(node.getState());
+                }
+            }
+            if(indx > -1) unstupid.add(nodeList.get(indx));
+        }
+
+        return unstupid;
     }
 
     private List<Space> determineToFlip(GameState state, int row, int col, int incRow, int incCol, int playerNumber){

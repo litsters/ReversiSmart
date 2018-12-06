@@ -16,7 +16,7 @@ public class GameTreeTest {
     @Test
     public  void buildRoot() throws Exception {
         GameState state = new GameState(1);
-        GameTree tree = new GameTree(state, 1);
+        GameTree tree = new GameTree(state, 1,1000);
 
         IVisitor test = new Visitor();
         IGameTreeNode root = tree.getRoot();

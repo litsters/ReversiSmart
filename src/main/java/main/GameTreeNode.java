@@ -11,6 +11,7 @@ public class GameTreeNode implements IGameTreeNode{
     private static final int STABLE_UTILITY = 500;
     private static final int FRONTIER_UTILITY = -10;
     private static final int MOVE_UTILITY = 1;
+    private static final int EDGE_UTILITY = 25;
 
     public static final int UPLEFT = 0;
     public static final int UPRIGHT = 1;
@@ -88,6 +89,30 @@ public class GameTreeNode implements IGameTreeNode{
         utility += numFrontier(state) * FRONTIER_UTILITY;
         utility += numMoves(state) * MOVE_UTILITY;
         utility += numStupid(state) * STUPIDITY_UTILITY;
+        utility += numEdge(state, UTILITY_PLAYER_NUMBER) * EDGE_UTILITY;
+    }
+
+    /**
+     * Counts all edge pieces controlled by the player that aren't in immediate danger of being captured.
+     * @param state The state to use.
+     * @return Number of safe edge pieces controlled.
+     */
+    public int numEdge(GameState state, int playerNumber){
+        int count = 0;
+
+//        // Check left edge
+//        for(int row = 0; row < 8; ++row){
+//            // Look for consecutive groups controlled by player not adjacent to an enemy piece
+//            if(state.getValue(row,0) == 0) continue;    // Continue past empty spaces
+//            else if(state.getValue(row,0) != playerNumber){
+//                // Enemy space encountered. Skip the next consecutive group of controlled spaces.
+//                while(state.getValue(row,0))
+//            } else {
+//                // Space is controlled. Count all consecutive pieces, provided they don't end with an enemy space.
+//            }
+//        }
+
+        return count;
     }
 
     public int numStupid(GameState state){
@@ -131,7 +156,7 @@ public class GameTreeNode implements IGameTreeNode{
                 if(state.getValue(i,j) == UTILITY_PLAYER_NUMBER){
                     if(j > 0 && state.getValue(i, j-1) == 0) ++count;       // Check to the left
                     else if(j < 7 && state.getValue(i, j+1) == 0) ++count;  // Check to the right
-                    else if(i > 0 && state.getValue(i-1,j) == 0) ++count;   // Check up
+                    else if(i > 0 && state.getValue(i-1,j) == 0) ++count;  // Check up
                     else if(i < 7 && state.getValue(i+1, j) == 0) ++count; // Check down
                 }
             }
