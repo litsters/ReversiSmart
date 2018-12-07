@@ -209,9 +209,10 @@ public class VisitorTest {
                 {0,0,0,0,2,2,1,0},
                 {0,0,0,0,0,2,0,0}
         };
+//        System.out.println("Test-1");
         GameState state = new GameState(2);
         state.setStatesArray(grid);
-
+//        System.out.println("Test-2");
         GameTree tree = new GameTree(state, 5, 4000);
 
         Visitor visitor = new Visitor();

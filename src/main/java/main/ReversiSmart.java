@@ -10,7 +10,7 @@ import java.util.Random;
  */
 public class ReversiSmart {
     private static final int BASE_PORT = 3333;
-    private static final int SECS_PER_GAME = 180000;
+    private static final long SECS_PER_GAME = 180000;
 
     private int playerNumber;
     private PlayerSocket socket;
@@ -19,7 +19,7 @@ public class ReversiSmart {
     private GameState state;
     private ValidMoves validMoves;
     private Random generator;
-    private int secsUsed;
+    private long secsUsed;
 
     /**
      * Main method that establishes a connection and then moves whenever it is this player's turn
@@ -46,7 +46,7 @@ public class ReversiSmart {
             if(this.turn == this.playerNumber){
                 // It is this player's turn
                 long timerStart = System.currentTimeMillis();
-                int secsForMove = (SECS_PER_GAME - this.secsUsed) / this.state.countUnclaimed();
+                long secsForMove = (SECS_PER_GAME - this.secsUsed) / this.state.countUnclaimed();
                 this.validMoves = this.state.getValidMoves(round);
 
                 int myMove = move(secsForMove);
@@ -62,7 +62,7 @@ public class ReversiSmart {
      * Determines what move to take. Moves randomly for now.
      * @return The index of the right move to make.
      */
-    private int move(int secsForMove){
+    private int move(long secsForMove){
         if(round < 4){
             return generator.nextInt(this.validMoves.getNumValidMoves());
         }
