@@ -20,6 +20,7 @@ public class ReversiSmart {
     private ValidMoves validMoves;
     private Random generator;
     private long secsUsed;
+    int divideFactor = 2;
 
     /**
      * Main method that establishes a connection and then moves whenever it is this player's turn
@@ -46,7 +47,7 @@ public class ReversiSmart {
             if(this.turn == this.playerNumber){
                 // It is this player's turn
                 long timerStart = System.currentTimeMillis();
-                long secsForMove = (SECS_PER_GAME - this.secsUsed) / this.state.countUnclaimed();
+                long secsForMove = (SECS_PER_GAME - this.secsUsed) / (this.state.countUnclaimed()  * this.state.countUnclaimed() / divideFactor );
                 this.validMoves = this.state.getValidMoves(round);
 
                 int myMove = move(secsForMove);
