@@ -44,7 +44,7 @@ public class GameTreeNodeTest {
         assertTrue(test.numStable(state) == 0);
         assertTrue(test.numMoves(state) == 6);
         assertTrue(test.numStupid(state) == 1);
-        assertTrue(test.getUtility() == -2534);
+        assertTrue(test.getUtility() == -2480);
     }
 
     @Test
@@ -68,7 +68,7 @@ public class GameTreeNodeTest {
         assertTrue(test.numStable(state) == 0);
         assertTrue(test.numMoves(state) == 6);
         assertTrue(test.numStupid(state) == 1);
-        assertTrue(test.getUtility() == -2564);
+        assertTrue(test.getUtility() == -2510);
     }
 
     @Test
@@ -347,5 +347,39 @@ public class GameTreeNodeTest {
 
         // Test 8: count stupid
         assertTrue(test.numStupid(state) == 9);
+    }
+
+    @Test
+    public void trapTest(){
+        GameTreeNode.UTILITY_PLAYER_NUMBER = 1;
+        int[][] grid = new int[8][8];
+        for(int i = 0; i < 8; ++i)for(int j = 0; j < 8; ++j)grid[i][j] = 0;
+
+        GameState state = new GameState(1);
+        state.setStatesArray(grid);
+        GameTreeNode test = new GameTreeNode(state, 5);
+
+        // Test 1: Nothing
+        assertTrue(test.numTrap(state) == 0);
+
+        // Test 2: No corner captured
+        state.setValue(2,0,3);
+        assertTrue(test.numTrap(state) == 0);
+
+        // Test 3: Corners captured
+        state.setValue(1,0,0);
+        state.setValue(1,0,7);
+        assertTrue(test.numTrap(state) == 0);
+
+        // Test 4: All captured but 1 space
+        state.setValue(1,0,1);
+        state.setValue(1,0,2);
+        state.setValue(1,0,4);
+        state.setValue(1,0,5);
+        assertTrue(test.numTrap(state) == 0);
+
+        // Test 5: Complete row
+        state.setValue(1,0,6);
+        assertTrue(test.numTrap(state) == 1);
     }
 }

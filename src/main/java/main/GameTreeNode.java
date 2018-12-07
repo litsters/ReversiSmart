@@ -15,6 +15,7 @@ public class GameTreeNode implements IGameTreeNode{
     private static final int MOVE_UTILITY = 10;
     private static final int EDGE_UTILITY = 25;
     private static final int CONTROL_UTILITY = 50;
+    private static final int TRAP_UTILITY = -2500;
 
     GameState state;
     private int index;
@@ -89,6 +90,69 @@ public class GameTreeNode implements IGameTreeNode{
         utility += numStupid(state) * STUPIDITY_UTILITY;
         utility += numEdge(state, UTILITY_PLAYER_NUMBER) * EDGE_UTILITY;
         utility += controlSquare(state) * CONTROL_UTILITY;
+        utility += numTrap(state) * TRAP_UTILITY;
+    }
+
+    /**
+     * Counts "trap" spaces; edge spaces controlled by an opponent that can't be captured.
+     * @param state The state to measure.
+     * @return The number of trap spaces the opponent controls.
+     */
+    public int numTrap(GameState state){
+        int playerNumber = state.getPlayerNumber();
+        int enemyNumber = enemy(playerNumber);
+
+        int count = 0;
+        // Check left edge
+        if(state.getValue(0,0) == playerNumber && state.getValue(7,0) == playerNumber){
+            // Player must control both corners for there to be trap spaces
+            int temp = 0;
+            for(int row = 1; row < 7; ++row){
+                if(state.getValue(row,0) == 0){
+                    temp = 0;
+                    break;
+                } else if(state.getValue(row,0) == enemyNumber) ++temp;
+            }
+            count += temp;
+        }
+
+        // Check top edge
+        if(state.getValue(0,0) == playerNumber && state.getValue(0,7) == playerNumber){
+            int temp = 0;
+            for(int col = 1; col < 7; ++col){
+                if(state.getValue(0,col) == 0){
+                    temp = 0;
+                    break;
+                } else if(state.getValue(0,col) == enemyNumber) ++temp;
+            }
+            count += temp;
+        }
+
+        // Check right edge
+        if(state.getValue(0,7) == playerNumber && state.getValue(7,7) == playerNumber){
+            int temp = 0;
+            for(int row = 1; row < 7; ++row){
+                if(state.getValue(row,7) == 0){
+                    temp = 0;
+                    break;
+                } else if(state.getValue(row,7) == enemyNumber) ++temp;
+            }
+            count += temp;
+        }
+
+        // Check bottom edge
+        if(state.getValue(7,0) == playerNumber && state.getValue(7,7) == playerNumber){
+            int temp = 0;
+            for(int col = 1; col < 7; ++col){
+                if(state.getValue(7,col) == 0){
+                    temp = 0;
+                    break;
+                } else if(state.getValue(7,col) == enemyNumber) ++temp;
+            }
+            count += temp;
+        }
+
+        return count;
     }
 
 
