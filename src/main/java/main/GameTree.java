@@ -14,43 +14,23 @@ public class GameTree implements IGameTree{
     public GameTree(GameState state, int round, long secsForMove) {
         long startTime = System.currentTimeMillis();
         queue = new LinkedList<>();
-//        System.out.println("Checkpoint alpha: ->" + (System.currentTimeMillis() - startTime));
 
         GameState gameState = new GameState(state.getPlayerNumber());
-//        System.out.println("Checkpoint beta: ->" + (System.currentTimeMillis() - startTime));
         int [][] tempStatesArray = copyArray(state.getStatesArray());
-//        System.out.println("Checkpoint gamma: ->" + (System.currentTimeMillis() - startTime));
         gameState.setStatesArray(tempStatesArray);
-//        System.out.println("Checkpoint delta: ->" + (System.currentTimeMillis() - startTime));
 
         root = new GameTreeNode(gameState,round);
-//        System.out.println("Checkpoint A: root created->" + (System.currentTimeMillis() - startTime));
 
-
-        long endTime = startTime + SECS_PER_MOVE;
-//        System.out.println("end time = " + endTime);
-//        System.out.println("building children!");
-//        FLAG = true;
+//        long endTime = startTime + SECS_PER_MOVE;
+        long endTime = startTime + secsForMove;
 
         buildChildren(root, root.getRound()+1, root.getState().getPlayerNumber(), endTime);
 
         // Check if there is a child already that increases the number of stable spaces; if so,
         // only allow the child with the greatest increase of stable spaces.
         if(seizeStable()){
-//            System.out.println("Seizing stable spaces");
             return;
         }
-//        FLAG = false;
-
-        //This code works for three levels
-//        for (IGameTreeNode node : root.getChildren()) {
-//            buildChildren(node, node.getRound()+1, node.getState().getPlayerNumber());
-//            if(node.getChildren() != null) {
-//                for (IGameTreeNode node2 : node.getChildren()) {
-//                    buildChildren(node2, node2.getRound() + 1, node2.getState().getPlayerNumber());
-//                }
-//            }
-//        }
 
         IGameTreeNode node = queue.poll();
         while(System.currentTimeMillis() < endTime && node != null){
@@ -63,20 +43,16 @@ public class GameTree implements IGameTree{
     }
 
     private boolean seizeStable(){
-//        System.out.println("Seizing stable!");
         // First see if a corner can be taken
         int curCorners = root.numCorners(root.getState(), root.getState().getPlayerNumber());
-//        System.out.println("Current corners = " + curCorners);
         IGameTreeNode bestCorners = null;
         for(IGameTreeNode n : queue){
             GameTreeNode node = (GameTreeNode)n;
             if(node.numCorners(node.getState(), node.getState().getPlayerNumber()) > curCorners){
                 bestCorners = node;
-//                System.out.println("  Found node w/ better corner control");
             }
         }
         if(bestCorners != null){
-//            System.out.println("  Updating queue w/ better corner control");
             LinkedList<IGameTreeNode> updated = new LinkedList<>();
             updated.add(bestCorners);
             queue = updated;
@@ -114,12 +90,9 @@ public class GameTree implements IGameTree{
         List<IGameTreeNode> children = new ArrayList<>();
         ValidMoves validMoves = node.getState().getValidMoves(round);
         int numValidMoves = node.getState().getValidMoves(round).getNumValidMoves();
-//        if(FLAG)System.out.println("Building children: valid moves = " + numValidMoves);
 
         for(int i = 0; i < numValidMoves; i++){
-            long start = System.currentTimeMillis();
             if(System.currentTimeMillis() >= endTime){
-                System.out.println("****************** TIME OUT ************************");
                 break;
             }
             int index = validMoves.getValue(i);
@@ -130,11 +103,9 @@ public class GameTree implements IGameTree{
 
             GameState gameState = new GameState(childNodePlayerNumber);
             int [][] tempStatesArray = copyArray(node.getState().getStatesArray());
-//            System.out.println("Checkpoint 1: Objects created->" + (System.currentTimeMillis() - start));
 
             gameState.setStatesArray(tempStatesArray);
             gameState.setValue(playerNumber, row, col);
-//            System.out.println("Checkpoint 2: State set------->" + (System.currentTimeMillis() - start));
             // now identify any flipped spaces
             List<Space> toFlip = new ArrayList<>();
             // Check to the right
@@ -169,20 +140,12 @@ public class GameTree implements IGameTree{
             temp = determineToFlip(gameState, row, col, 1, -1, playerNumber);
             toFlip.addAll(temp);
 
-//            System.out.println("Checkpoint 3: Flips identified->" + (System.currentTimeMillis() - start));
-
             // Flip all spaces
             for(Space space : toFlip) gameState.setValue(playerNumber, space.row, space.col);
-
-//            System.out.println("Checkpoint 4: Flips complete--->" + (System.currentTimeMillis() - start));
-
-//            if(FLAG)System.out.println("  Child state:");
-//            if(FLAG)gameState.display();
 
             GameTreeNode tempNode = new GameTreeNode(gameState,round);
             tempNode.setIndex(i);
             children.add(tempNode);
-//            System.out.println("Checkpoint 5: Complete--------->" + (System.currentTimeMillis() - start));
         }
         if(numValidMoves > 0) {
             // Eliminate all children with stupid moves, unless all of them do (in which case, leave the one that is
@@ -194,7 +157,6 @@ public class GameTree implements IGameTree{
     }
 
     List<IGameTreeNode> pruneStupid(List<IGameTreeNode> nodeList){
-//        System.out.println("Pruning stupid: started with " + nodeList.size() + " children");
         List<IGameTreeNode> unstupid = new ArrayList<>();
         // Only take the nodes that don't have stupid moves
         for(IGameTreeNode n : nodeList){
@@ -203,7 +165,6 @@ public class GameTree implements IGameTree{
         }
         // If no nodes were added, take only the one with the greatest utility
         if(unstupid.size() == 0){
-//            System.out.println("No unstupid options available!");
             int minStupid = Integer.MAX_VALUE;
             int indx = -1;
             for(int i = 0; i < nodeList.size(); ++i){
@@ -216,7 +177,6 @@ public class GameTree implements IGameTree{
             if(indx > -1) unstupid.add(nodeList.get(indx));
         }
 
-//        System.out.println("Done pruning stupid: " + unstupid.size() + " remaining");
         return unstupid;
     }
 

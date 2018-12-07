@@ -12,7 +12,7 @@ public class GameTreeNode implements IGameTreeNode{
     private static final int STUPIDITY_UTILITY = -2500;
     private static final int STABLE_UTILITY = 500;
     private static final int FRONTIER_UTILITY = -10;
-    private static final int MOVE_UTILITY = 1;
+    private static final int MOVE_UTILITY = 10;
     private static final int EDGE_UTILITY = 25;
     private static final int CONTROL_UTILITY = 50;
 

@@ -47,7 +47,9 @@ public class ReversiSmart {
             if(this.turn == this.playerNumber){
                 // It is this player's turn
                 long timerStart = System.currentTimeMillis();
-                long secsForMove = (SECS_PER_GAME - this.secsUsed) / (this.state.countUnclaimed()  * this.state.countUnclaimed() / divideFactor );
+                int divisor = (this.state.countUnclaimed()  * this.state.countUnclaimed() / divideFactor );
+                if(divisor == 0) divisor = 1;
+                long secsForMove = (SECS_PER_GAME - this.secsUsed) / divisor;
                 this.validMoves = this.state.getValidMoves(round);
 
                 int myMove = move(secsForMove);
