@@ -20,7 +20,8 @@ public class ReversiSmart {
     private ValidMoves validMoves;
     private Random generator;
     private long secsUsed;
-    int divideFactor = 2;
+    int divideFactorNumerator = 2;
+    int divideFactorDenominator = 7;
 
     /**
      * Main method that establishes a connection and then moves whenever it is this player's turn
@@ -47,7 +48,8 @@ public class ReversiSmart {
             if(this.turn == this.playerNumber){
                 // It is this player's turn
                 long timerStart = System.currentTimeMillis();
-                int divisor = (this.state.countUnclaimed()  * this.state.countUnclaimed() / divideFactor );
+//                int divisor = (this.state.countUnclaimed()  * this.state.countUnclaimed() / divideFactor );
+                int divisor = (this.state.countUnclaimed() * divideFactorNumerator) / divideFactorDenominator;
                 if(divisor == 0) divisor = 1;
                 long secsForMove = (SECS_PER_GAME - this.secsUsed) / divisor;
                 this.validMoves = this.state.getValidMoves(round);
@@ -57,6 +59,7 @@ public class ReversiSmart {
                 this.socket.send(sel);
                 long timerEnd = System.currentTimeMillis();
                 this.secsUsed += (timerEnd - timerStart);
+                System.out.println("Seconds used: " + this.secsUsed);
             }
         }
     }
